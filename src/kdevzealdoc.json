@@ -1,0 +1,9 @@
+{
+    "KPlugin": {
+        "Description": "kdevzealdoc",
+        "Id": "kdevzealdoc",
+        "Name": "kdevzealdoc"
+    },
+    "X-KDevelop-Category": "Global",
+    "X-KDevelop-Mode": "GUI"
+}
