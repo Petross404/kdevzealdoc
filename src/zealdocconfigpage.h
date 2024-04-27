@@ -19,31 +19,38 @@
 
 #pragma once
 
-#include <interfaces/iplugin.h>
-#include <interfaces/idocumentationproviderprovider.h>
+#include <interfaces/configpage.h>
 
-#include <qobject.h>
+namespace Ui
+{
 
-class ZealdocProvider;
+class ZealdocConfigPage;
 
-class ZealdocPlugin : public KDevelop::IPlugin, public KDevelop::IDocumentationProviderProvider
+}
+
+class ZealdocPlugin;
+
+class ZealdocConfigPage: public KDevelop::ConfigPage
 {
         Q_OBJECT
-        Q_INTERFACES ( KDevelop::IDocumentationProviderProvider )
 
 public:
-        ZealdocPlugin ( QObject* parent, const QVariantList& args );
-        ~ZealdocPlugin() override;
+        ZealdocConfigPage ( KDevelop::IPlugin* plugin, QWidget* parent );
+        ~ZealdocConfigPage() override;
 
-        QList<KDevelop::IDocumentationProvider*> providers() override;
+        KDevelop::ConfigPage::ConfigPageType configPageType() const override;
 
-        int configPages() const override;
-        KDevelop::ConfigPage* configPage ( int number, QWidget* parent ) override;
+        QString name() const override;
+        QString fullName() const override;
+        QIcon icon() const override;
 
-        void reloadDocsets();
+        void apply() override;
+        void defaults() override;
+        void reset() override;
 
-Q_SIGNALS:
-        void changedProvidersList() override;
 private:
-        QList<ZealdocProvider*> m_providers;
+        void reloadDocsets ( const QString& path );
+
+        QScopedPointer<Ui::ZealdocConfigPage> ui;
+        ZealdocPlugin* m_plugin;
 };

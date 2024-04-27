@@ -17,7 +17,7 @@
   Boston, MA 02110-1301, USA.
   */
 
-#include "kdevzealdoc.h"
+#include "zealdocplugin.h"
 #include "zealdocprovider.h"
 #include "zealdocconfigpage.h"
 #include "util.h"
@@ -68,7 +68,7 @@ void ZealdocPlugin::reloadDocsets()
 		}
 		else
 		{
-			loaded = provider->name();
+			loaded << provider->name();
 		}
 	}
 
@@ -93,7 +93,7 @@ void ZealdocPlugin::reloadDocsets()
 			continue;
 		}
 
-		m_providers = docset;
+		m_providers << docset;
 		hasChanges = true;
 	}
 
@@ -109,7 +109,7 @@ QList<KDevelop::IDocumentationProvider*> ZealdocPlugin::providers()
 
 	for ( const auto p : m_providers )
 	{
-		result = p;
+		result << p;
 	}
 
 	return result;
@@ -130,7 +130,4 @@ KDevelop::ConfigPage* ZealdocPlugin::configPage( int number, QWidget* parent )
 	return new ZealdocConfigPage( this, parent );
 }
 
-
-// needed for QObject class created from K_PLUGIN_FACTORY_WITH_JSON
-#include "kdevzealdoc.moc"
-#include "moc_kdevzealdoc.cpp"
+#include "zealdocplugin.moc"

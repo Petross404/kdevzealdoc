@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+	<class>ZealdocConfigPage</class>
+<widget class="QWidget" name="ZealdocConfigPage">
+	<property name="geometry">
+	<rect>
+	<x>0</x>
+	<y>0</y>
+	<width>485</width>
+<height>568</height>
+</rect>
+</property>
+<property name="windowTitle">
+	<string>Cppcheck Settings</string>
+</property>
+<layout class="QVBoxLayout" name="verticalLayout">
+	<item>
+	<layout class="QHBoxLayout" name="horizontalLayout">
+	<item>
+	<widget class="QLabel" name="cppcheckLabel">
+	<property name="text">
+	<string>&amp;Docsets path</string>
+</property>
+<property name="alignment">
+	<set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+</property>
+<property name="buddy">
+	<cstring>kcfg_docsetsPath</cstring>
+</property>
+</widget>
+</item>
+<item>
+	<widget class="KUrlRequester" name="kcfg_docsetsPath">
+	<property name="mode">
+	<set>KFile::Directory|KFile::ExistingOnly</set>
+</property>
+</widget>
+</item>
+</layout>
+</item>
+<item>
+	<widget class="QLabel" name="label">
+	<property name="text">
+	<string>Available Docsets:</string>
+</property>
+</widget>
+</item>
+<item>
+	<widget class="QListWidget" name="docsetsList"/>
+	</item>
+	</layout>
+	</widget>
+	<customwidgets>
+	<customwidget>
+	<class>KUrlRequester</class>
+<extends>QWidget</extends>
+<header>kurlrequester.h</header>
+<container>1</container>
+</customwidget>
+</customwidgets>
+<resources/>
+<connections/>
+</ui>
