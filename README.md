@@ -1,1 +1,1 @@
-KDevelop plugin to intergate zeal docsets inside the IDE.
+KDevelop plugin to embed zeal docsets inside the IDE.
