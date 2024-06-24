@@ -36,7 +36,7 @@ include_directories(
 )
 
 set(kdevzealdoc_SRCS
-    src/zealdocplugin.cpp
+    src/kdevzealdoc.cpp
     src/zealdocprovider.cpp
     src/zealdocumentation.cpp
     src/zealdocconfigpage.cpp

@@ -71,7 +71,7 @@ void ZealdocPlugin::reloadDocsets()
 		}
 		else
 		{
-			loaded = provider->name(); // Store name of loaded provider
+			loaded << provider->name(); // Store name of loaded provider
 		}
 	}
 
@@ -96,7 +96,7 @@ void ZealdocPlugin::reloadDocsets()
 			continue;
 		}
 
-		m_providers = docset; // Add valid docset provider to list
+		m_providers << docset; // Add valid docset provider to list
 		hasChanges = true; // Indicate changes were made
 	}
 
@@ -113,7 +113,7 @@ QList<KDevelop::IDocumentationProvider*> ZealdocPlugin::providers()
 
 	for ( const auto p : m_providers )
 	{
-		result = p; // Populate result with each provider
+		result << p; // Populate result with each provider
 	}
 
 	return result; // Return list of providers

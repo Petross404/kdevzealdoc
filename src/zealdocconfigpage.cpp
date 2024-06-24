@@ -20,7 +20,7 @@
 #include "zealdocconfigpage.h"
 #include "ui_zealdocconfigpage.h"
 
-#include "zealdocplugin.h"
+#include "kdevzealdoc.h"
 #include "util.h"
 #include "debug.h"
 
