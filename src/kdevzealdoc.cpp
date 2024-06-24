@@ -1,21 +1,21 @@
 /* This file is part of KDevelop
-  C opyright 2016 Anton Anik**in <anton.anikin@htower.ru>
-
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public
-  License as published by the Free Software Foundation; either
-  version 2 of the License, or (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; see the file COPYING.  If not, write to
-  the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-  Boston, MA 02110-1301, USA.
-  */
+ *  C opyright 2016 Anton Anik**in <anton.anikin@htower.ru>
+ *
+ *  This program is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2 of the License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ *  General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; see the file COPYING.  If not, write to
+ *  the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ *  Boston, MA 02110-1301, USA.
+ */
 
 #include "kdevzealdoc.h"
 #include "zealdocprovider.h"
@@ -29,6 +29,7 @@
 #include <KPluginFactory>
 #include <KLocalizedString>
 
+// Factory registration for the ZealdocPlugin class using JSON configuration
 K_PLUGIN_FACTORY_WITH_JSON( ZealdocFactory, "kdevzealdoc.json", registerPlugin<ZealdocPlugin>(); )
 
 using namespace KDevelop;
@@ -36,23 +37,25 @@ using namespace KDevelop;
 ZealdocPlugin::ZealdocPlugin( QObject* parent, const QVariantList& )
 	: KDevelop::IPlugin( QString::fromLocal8Bit( "kdevzealdoc" ), parent )
 {
-	//KDEV_USE_EXTENSION_INTERFACE( KDevelop::IDocumentationProviderProvider )
-
+	// Connect the signal changedProvidersList to the documentationController's slot
 	connect( this,
 	         &ZealdocPlugin::changedProvidersList,
 	         KDevelop::ICore::self()->documentationController(),
 	         &KDevelop::IDocumentationController::changedDocumentationProviders );
 
+	// Reload documentation sets upon plugin initialization
 	reloadDocsets();
 }
 
+// Destructor
 ZealdocPlugin::~ZealdocPlugin() = default;
 
+// Reloads documentation sets based on enabled docsets
 void ZealdocPlugin::reloadDocsets()
 {
-	QStringList enabled = enabledDocsets();
-	QStringList loaded;
-	bool hasChanges = false;
+	QStringList enabled = enabledDocsets(); // Retrieve enabled documentation sets
+	QStringList loaded; // List of currently loaded docsets
+	bool hasChanges = false; // Flag to track changes in providers list
 
 	// First, unload disabled docsets
 	QMutableListIterator<ZealdocProvider*> i( m_providers );
@@ -63,12 +66,12 @@ void ZealdocPlugin::reloadDocsets()
 
 		if ( !enabled.contains( provider->name() ) )
 		{
-			i.remove();
-			hasChanges = true;
+			i.remove(); // Remove provider from list
+			hasChanges = true; // Indicate changes were made
 		}
 		else
 		{
-			loaded = provider->name();
+			loaded = provider->name(); // Store name of loaded provider
 		}
 	}
 
@@ -77,60 +80,62 @@ void ZealdocPlugin::reloadDocsets()
 	{
 		if ( !enabled.contains( docsetInformation.title ) )
 		{
-			continue;
+			continue; // Skip docsets not enabled
 		}
 
 		if ( loaded.contains( docsetInformation.title ) )
 		{
-			continue;
+			continue; // Skip docsets already loaded
 		}
 
 		auto docset = new ZealdocProvider( docsetInformation.path, this );
 
 		if ( !docset->isValid() )
 		{
-			delete docset;
+			delete docset; // Clean up invalid docset objects
 			continue;
 		}
 
-		m_providers = docset;
-		hasChanges = true;
+		m_providers = docset; // Add valid docset provider to list
+		hasChanges = true; // Indicate changes were made
 	}
 
 	if ( !hasChanges )
 	{
-		emit changedProvidersList();
+		emit changedProvidersList(); // Emit signal if providers list was modified
 	}
 }
 
+// Returns list of documentation providers managed by the plugin
 QList<KDevelop::IDocumentationProvider*> ZealdocPlugin::providers()
 {
 	QList<KDevelop::IDocumentationProvider*> result;
 
 	for ( const auto p : m_providers )
 	{
-		result = p;
+		result = p; // Populate result with each provider
 	}
 
-	return result;
+	return result; // Return list of providers
 }
 
+// Returns the number of configuration pages provided by the plugin (always 1)
 int ZealdocPlugin::configPages() const
 {
 	return 1;
 }
 
+// Returns the configuration page for the specified number (only one page supported)
 KDevelop::ConfigPage* ZealdocPlugin::configPage( int number, QWidget* parent )
 {
 	if ( number )
 	{
-		return nullptr;
+		return nullptr; // Return nullptr if number is not 0 (only one page supported)
 	}
 
-	return new ZealdocConfigPage( this, parent );
+	return new ZealdocConfigPage( this, parent ); // Create and return configuration page
 }
 
-
-// needed for QObject class created from K_PLUGIN_FACTORY_WITH_JSON
+// Required for QObject class created from K_PLUGIN_FACTORY_WITH_JSON
 #include "kdevzealdoc.moc"
 #include "moc_kdevzealdoc.cpp"

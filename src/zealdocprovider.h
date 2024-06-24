@@ -1,20 +1,18 @@
-/* This file is part of KDevelop
- * Copyright 2016 Anton Anikin <anton.anikin@htower.ru>
+/*!
+ * \file zealdocprovider.h
+ * \brief This file is part of KDevelop and provides the ZealdocProvider class definition.
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
- * Boston, MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along with this program; see the file COPYING. If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
+ * \author Anton Anikin <anton.anikin@htower.ru>
+ * \date 2016
  */
 
 #pragma once
@@ -26,45 +24,114 @@
 #include <QUrl>
 #include <QStringListModel>
 
+/*!
+ * \class ZealdocProvider
+ * \brief The ZealdocProvider class provides documentation functionalities for KDevelop using Zeal docsets.
+ *
+ * This class implements the KDevelop::IDocumentationProvider interface to integrate with KDevelop's documentation system.
+ */
 class ZealdocProvider : public QObject, public KDevelop::IDocumentationProvider
 {
         Q_OBJECT
-        Q_INTERFACES ( KDevelop::IDocumentationProvider )
+        Q_INTERFACES(KDevelop::IDocumentationProvider)
 
 public:
-        ZealdocProvider ( const QString& docsetPath, QObject* parent );
+        /*!
+         * \brief Constructs the ZealdocProvider with the specified docset path and parent object.
+         * \param docsetPath The path to the docset.
+         * \param parent The parent QObject.
+         */
+        ZealdocProvider(const QString& docsetPath, QObject* parent);
+
+        /*!
+         * \brief Destroys the ZealdocProvider.
+         */
         ~ZealdocProvider() override;
 
+        /*!
+         * \brief Checks if the documentation provider is valid.
+         * \return True if the provider is valid, false otherwise.
+         */
         bool isValid();
 
+        /*!
+         * \brief Returns the icon representing the documentation provider.
+         * \return The icon.
+         */
         QIcon icon() const override;
+
+        /*!
+         * \brief Returns the name of the documentation provider.
+         * \return The name.
+         */
         QString name() const override;
 
+        /*!
+         * \brief Returns the home page of the documentation.
+         * \return The home page documentation pointer.
+         */
         KDevelop::IDocumentation::Ptr homePage() const override;
 
-        KDevelop::IDocumentation::Ptr documentation ( const QUrl& url ) const override;
-        KDevelop::IDocumentation::Ptr documentationForDeclaration ( KDevelop::Declaration* dec ) const override;
-        KDevelop::IDocumentation::Ptr documentationForIndex ( const QModelIndex& index ) const override;
-        KDevelop::IDocumentation::Ptr documentationForToken ( const QString& token ) const;
+        /*!
+         * \brief Returns the documentation for the specified URL.
+         * \param url The URL to get documentation for.
+         * \return The documentation pointer.
+         */
+        KDevelop::IDocumentation::Ptr documentation(const QUrl& url) const override;
 
+        /*!
+         * \brief Returns the documentation for the specified declaration.
+         * \param dec The declaration to get documentation for.
+         * \return The documentation pointer.
+         */
+        KDevelop::IDocumentation::Ptr documentationForDeclaration(KDevelop::Declaration* dec) const override;
+
+        /*!
+         * \brief Returns the documentation for the specified index.
+         * \param index The index to get documentation for.
+         * \return The documentation pointer.
+         */
+        KDevelop::IDocumentation::Ptr documentationForIndex(const QModelIndex& index) const override;
+
+        /*!
+         * \brief Returns the documentation for the specified token.
+         * \param token The token to get documentation for.
+         * \return The documentation pointer.
+         */
+        KDevelop::IDocumentation::Ptr documentationForToken(const QString& token) const;
+
+        /*!
+         * \brief Returns the index model for the documentation.
+         * \return The index model pointer.
+         */
         QAbstractListModel* indexModel() const override;
 
+        /*!
+         * \brief Returns the list of token groups.
+         * \return The list of token groups.
+         */
         QStringList tokenGroups() const;
-        QIcon groupIcon ( const QString& group );
-        QStringList groupTokens ( const QString& group ) const;
-        /*
-        Q_SIGNALS:
-                void addHistory(const KDevelop::IDocumentation::Ptr& doc) const;*/
+
+        /*!
+         * \brief Returns the icon for the specified group.
+         * \param group The group to get the icon for.
+         * \return The icon.
+         */
+        QIcon groupIcon(const QString& group);
+
+        /*!
+         * \brief Returns the list of tokens for the specified group.
+         * \param group The group to get tokens for.
+         * \return The list of tokens.
+         */
+        QStringList groupTokens(const QString& group) const;
 
 private:
-        bool m_isValid;
-        QString m_name;
-        QIcon m_icon;
-
-        QStringListModel* m_model;
-
-        QStringList m_tokenGroups;
-        QMap< QString, QStringList > m_groupTokens;
-
-        QMap< QString, QUrl > m_tokenUrls;
+        bool m_isValid; /**< Indicates whether the provider is valid. */
+        QString m_name; /**< The name of the provider. */
+        QIcon m_icon; /**< The icon of the provider. */
+        QStringListModel* m_model; /**< The index model. */
+        QStringList m_tokenGroups; /**< The list of token groups. */
+        QMap<QString, QStringList> m_groupTokens; /**< The map of group tokens. */
+        QMap<QString, QUrl> m_tokenUrls; /**< The map of token URLs. */
 };

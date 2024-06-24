@@ -31,7 +31,7 @@
 
 ZealdocConfigPage::ZealdocConfigPage( KDevelop::IPlugin* plugin, QWidget* parent )
 	: ConfigPage( plugin, nullptr, parent )
-	, ui( new Ui::ZealdocConfigPage )
+	, ui( std::make_unique<Ui::ZealdocConfigPage>() )
 	, m_plugin( dynamic_cast<ZealdocPlugin*>( plugin ) )
 {
 	ui->setupUi( this );
@@ -53,9 +53,7 @@ ZealdocConfigPage::ZealdocConfigPage( KDevelop::IPlugin* plugin, QWidget* parent
 	this, [this]( const QString & path ) { reloadDocsets( path ); } );
 }
 
-ZealdocConfigPage::~ZealdocConfigPage()
-{
-}
+ZealdocConfigPage::~ZealdocConfigPage() = default;
 
 void ZealdocConfigPage::reloadDocsets( const QString& path )
 {
