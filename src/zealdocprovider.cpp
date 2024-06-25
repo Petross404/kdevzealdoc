@@ -92,9 +92,7 @@ ZealdocProvider::ZealdocProvider( const QString& docsetPath, QObject* parent )
 	m_model->setStringList( allTokens );
 }
 
-ZealdocProvider::~ZealdocProvider()
-{
-}
+ZealdocProvider::~ZealdocProvider() = default;
 
 bool ZealdocProvider::isValid()
 {
@@ -155,7 +153,7 @@ KDevelop::IDocumentation::Ptr ZealdocProvider::documentationForToken( const QStr
 {
 	if ( !token.isEmpty() )
 	{
-		QUrl url = m_tokenUrls[token];
+		const QUrl url = m_tokenUrls[token];
 
 		if ( url.isValid() )
 		{

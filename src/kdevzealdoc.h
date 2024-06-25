@@ -60,7 +60,7 @@ public:
          * \brief Returns the number of configuration pages provided by the plugin.
          * \return Number of configuration pages.
          */
-        int configPages() const override;
+        [[nodiscard]] int configPages() const override;
 
         /*!
          * \brief Returns a configuration page for the specified number.

@@ -107,7 +107,7 @@ void ZealdocConfigPage::apply()
 {
 	QStringList enabled;
 
-	for ( int i = 0; i < ui->docsetsList->count(); i )
+	for ( int i = 0; i < ui->docsetsList->count(); i++ )
 	{
 		auto item = ui->docsetsList->item( i );
 
@@ -129,7 +129,7 @@ void ZealdocConfigPage::defaults()
 	QSignalBlocker blocker( this );
 	ui->kcfg_docsetsPath->setText( defaultDocsetsPath() );
 
-	for ( int i = 0; i < ui->docsetsList->count(); i )
+	for ( int i = 0; i < ui->docsetsList->count(); i++ )
 	{
 		ui->docsetsList->item( i )->setCheckState( Qt::Unchecked );
 	}

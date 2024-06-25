@@ -63,9 +63,7 @@ IDocumentationProvider* ZealDocumentation::provider() const
 
 // =================================================================================================
 
-ZealDocumentationHome::ZealDocumentationHome()
-{
-}
+ZealDocumentationHome::ZealDocumentationHome() = default;
 
 QString ZealDocumentationHome::name() const
 {

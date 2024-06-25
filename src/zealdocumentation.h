@@ -143,21 +143,21 @@ public:
          * \param parent The parent index.
          * \return The number of rows under the given parent.
          */
-        int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+        [[nodiscard]] int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
         /*!
          * \brief Returns the number of columns for the children of the given parent.
          * \param parent The parent index.
          * \return The number of columns for the children.
          */
-        int columnCount(const QModelIndex& parent = QModelIndex()) const override;
+        [[nodiscard]] int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
         /*!
          * \brief Returns the parent index of the given child index.
          * \param child The child index.
          * \return The parent index of the given child index.
          */
-        QModelIndex parent(const QModelIndex& child) const override;
+        [[nodiscard]] QModelIndex parent(const QModelIndex& child) const override;
 
         /*!
          * \brief Returns the index of the item in the specified row and column under the given parent.
@@ -166,7 +166,7 @@ public:
          * \param parent The parent index.
          * \return The index of the item.
          */
-        QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
+        [[nodiscard]] QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
 
         /*!
          * \brief Returns the data stored under the given role for the item referred to by the index.
@@ -174,7 +174,7 @@ public:
          * \param role The role for which the data is requested.
          * \return The data stored under the given role.
          */
-        QVariant data(const QModelIndex& index, int role) const override;
+        [[nodiscard]] QVariant data(const QModelIndex& index, int role) const override;
 
 public Q_SLOTS:
         /*!

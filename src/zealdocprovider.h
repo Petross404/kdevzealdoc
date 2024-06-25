@@ -58,73 +58,73 @@ public:
          * \brief Returns the icon representing the documentation provider.
          * \return The icon.
          */
-        QIcon icon() const override;
+        [[nodiscard]] QIcon icon() const override;
 
         /*!
          * \brief Returns the name of the documentation provider.
          * \return The name.
          */
-        QString name() const override;
+        [[nodiscard]] QString name() const override;
 
         /*!
          * \brief Returns the home page of the documentation.
          * \return The home page documentation pointer.
          */
-        KDevelop::IDocumentation::Ptr homePage() const override;
+        [[nodiscard]] KDevelop::IDocumentation::Ptr homePage() const override;
 
         /*!
          * \brief Returns the documentation for the specified URL.
          * \param url The URL to get documentation for.
          * \return The documentation pointer.
          */
-        KDevelop::IDocumentation::Ptr documentation(const QUrl& url) const override;
+        [[nodiscard]] KDevelop::IDocumentation::Ptr documentation(const QUrl& url) const override;
 
         /*!
          * \brief Returns the documentation for the specified declaration.
          * \param dec The declaration to get documentation for.
          * \return The documentation pointer.
          */
-        KDevelop::IDocumentation::Ptr documentationForDeclaration(KDevelop::Declaration* dec) const override;
+        [[nodiscard]] KDevelop::IDocumentation::Ptr documentationForDeclaration(KDevelop::Declaration* dec) const override;
 
         /*!
          * \brief Returns the documentation for the specified index.
          * \param index The index to get documentation for.
          * \return The documentation pointer.
          */
-        KDevelop::IDocumentation::Ptr documentationForIndex(const QModelIndex& index) const override;
+        [[nodiscard]] KDevelop::IDocumentation::Ptr documentationForIndex(const QModelIndex& index) const override;
 
         /*!
          * \brief Returns the documentation for the specified token.
          * \param token The token to get documentation for.
          * \return The documentation pointer.
          */
-        KDevelop::IDocumentation::Ptr documentationForToken(const QString& token) const;
+        [[nodiscard]] KDevelop::IDocumentation::Ptr documentationForToken(const QString& token) const;
 
         /*!
          * \brief Returns the index model for the documentation.
          * \return The index model pointer.
          */
-        QAbstractListModel* indexModel() const override;
+        [[nodiscard]] QAbstractListModel* indexModel() const override;
 
         /*!
          * \brief Returns the list of token groups.
          * \return The list of token groups.
          */
-        QStringList tokenGroups() const;
+        [[nodiscard]] QStringList tokenGroups() const;
 
         /*!
          * \brief Returns the icon for the specified group.
          * \param group The group to get the icon for.
          * \return The icon.
          */
-        QIcon groupIcon(const QString& group);
+        [[nodiscard]] QIcon groupIcon(const QString& group);
 
         /*!
          * \brief Returns the list of tokens for the specified group.
          * \param group The group to get tokens for.
          * \return The list of tokens.
          */
-        QStringList groupTokens(const QString& group) const;
+        [[nodiscard]] QStringList groupTokens(const QString& group) const;
 
 private:
         bool m_isValid; /**< Indicates whether the provider is valid. */

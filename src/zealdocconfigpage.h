@@ -57,25 +57,25 @@ public:
          * \brief Returns the type of the configuration page.
          * \return The configuration page type.
          */
-        KDevelop::ConfigPage::ConfigPageType configPageType() const override;
+        [[nodiscard]] KDevelop::ConfigPage::ConfigPageType configPageType() const override;
 
         /*!
          * \brief Returns the name of the configuration page.
          * \return The name of the page.
          */
-        QString name() const override;
+        [[nodiscard]] QString name() const override;
 
         /*!
          * \brief Returns the full name of the configuration page.
          * \return The full name of the page.
          */
-        QString fullName() const override;
+        [[nodiscard]] QString fullName() const override;
 
         /*!
          * \brief Returns the icon representing the configuration page.
          * \return The icon.
          */
-        QIcon icon() const override;
+        [[nodiscard]] QIcon icon() const override;
 
         /*!
          * \brief Applies the configuration changes made by the user.

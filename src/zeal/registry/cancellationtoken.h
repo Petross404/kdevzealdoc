@@ -25,9 +25,7 @@
 
 #include <QSharedPointer>
 
-namespace Zeal
-{
-namespace Registry
+namespace Zeal::Registry
 {
 
 /// Token that stores whether cancel was called on it.
@@ -35,14 +33,13 @@ namespace Registry
 struct CancellationToken {
 public:
         CancellationToken();
-        bool isCanceled() const;
+        [[nodiscard]] bool isCanceled() const;
         void cancel();
 
 private:
         QSharedPointer<bool> m_cancelled;
 };
 
-} // namespace Registry
 } // namespace Zeal
 
 Q_DECLARE_METATYPE ( Zeal::Registry::CancellationToken )

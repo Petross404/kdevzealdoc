@@ -33,7 +33,7 @@
 
 KConfigGroup zealdocConfig()
 {
-	KConfigGroup cg{ KSharedConfig::openConfig(), QStringLiteral("Zealdoc") };
+	const KConfigGroup cg{ KSharedConfig::openConfig(), QStringLiteral("Zealdoc") };
 	return cg;
 }
 
@@ -51,7 +51,7 @@ QString defaultDocsetsPath()
 		baseDataDir.cdUp();
 	}
 
-	QString docsetsPath = baseDataDir.canonicalPath() + QStringLiteral( "/Zeal/Zeal/docsets/" );
+	const QString docsetsPath = baseDataDir.canonicalPath() + QStringLiteral( "/Zeal/Zeal/docsets/" );
 
 	if ( QDir( docsetsPath ).exists() )
 	{
@@ -77,7 +77,7 @@ QList<DocsetInformation> availableDocsets( const QString& docsetsPath )
 
 	for ( auto docsetFsName : QDir( docsetsPath ).entryList( QDir::Dirs | QDir::NoDot | QDir::NoDotDot ) )
 	{
-		Zeal::Registry::Docset ds( docsetsPath + QStringLiteral( "/" ) + docsetFsName );
+		const Zeal::Registry::Docset ds( docsetsPath + QStringLiteral( "/" ) + docsetFsName );
 	}
 
 	return docsets;
