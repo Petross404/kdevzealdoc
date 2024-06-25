@@ -39,6 +39,7 @@ KConfigGroup zealdocConfig()
 
 QString defaultDocsetsPath()
 {
+	qDebug() << "defaultDocsetsPath";
 	QDir baseDataDir( QStandardPaths::writableLocation( QStandardPaths::DataLocation ) );
 
 	if ( !QCoreApplication::applicationName().isEmpty() )

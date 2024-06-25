@@ -700,7 +700,7 @@ static void matchFuzzy( int nLen, const unsigned char* needle, int hLen,
 	int j = 0;
 	int groups = 0;
 
-	for ( int i = 0; i < nLen; i )
+	for ( int i = 0; i < nLen; ++i )
 	{
 		bool found = false;
 		bool first = true;
@@ -798,7 +798,7 @@ static int scoreExact( int matchIndex, int matchLen, const unsigned char* value,
 		while ( i >= 0 )
 		{
 			if ( value[i] == DOT )
-				separators;
+				++separators;
 
 			--i;
 		}
@@ -814,7 +814,7 @@ static int scoreExact( int matchIndex, int matchLen, const unsigned char* value,
 	{
 		if ( value[matchIndex + matchLen + i] == DOT )
 		{
-			separators;
+			++separators;
 		}
 
 		--i;

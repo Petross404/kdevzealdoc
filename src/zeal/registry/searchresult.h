@@ -27,9 +27,7 @@
 #include <QString>
 #include <QUrl>
 
-namespace Zeal
-{
-namespace Registry
+namespace Zeal::Registry
 {
 
 class Docset;
@@ -52,7 +50,6 @@ struct SearchResult {
         }
 };
 
-} // namespace Registry
 } // namespace Zeal
 
 #endif // SEARCHRESULT_H

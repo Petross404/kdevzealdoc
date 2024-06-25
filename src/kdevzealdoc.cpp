@@ -32,8 +32,6 @@
 // Factory registration for the ZealdocPlugin class using JSON configuration
 K_PLUGIN_FACTORY_WITH_JSON( ZealdocFactory, "kdevzealdoc.json", registerPlugin<ZealdocPlugin>(); )
 
-using namespace KDevelop;
-
 ZealdocPlugin::ZealdocPlugin( QObject* parent, const QVariantList& )
 	: KDevelop::IPlugin( QString::fromLocal8Bit( "kdevzealdoc" ), parent )
 {
