@@ -47,10 +47,16 @@ ZealdocConfigPage::ZealdocConfigPage( KDevelop::IPlugin* plugin, QWidget* parent
 
 	reloadDocsets( docsetsPath() );
 
-	connect( m_ui->docsetsList, &QListWidget::itemChanged, this, [this]( QListWidgetItem* ) { emit changed(); } );
+	connect( m_ui->docsetsList, &QListWidget::itemChanged, this, [this]( QListWidgetItem* )
+	{
+		emit changed();
+	} );
 
 	connect( m_ui->kcfg_docsetsPath, &KUrlRequester::textChanged,
-	this, [this]( const QString & path ) { reloadDocsets( path ); } );
+		 this, [this]( const QString & path )
+	{
+		reloadDocsets( path );
+	} );
 }
 
 ZealdocConfigPage::~ZealdocConfigPage() = default;
@@ -117,7 +123,7 @@ void ZealdocConfigPage::apply()
 		}
 	}
 
-	KConfigGroup config{ KSharedConfig::openConfig(),"Zealdoc" };
+	KConfigGroup config{ KSharedConfig::openConfig(), "Zealdoc" };
 	config.writeEntry( QStringLiteral( "DocsetsPath" ), m_ui->kcfg_docsetsPath->text() );
 	config.writeEntry( QStringLiteral( "EnabledDocsets" ), enabled );
 

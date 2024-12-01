@@ -59,7 +59,7 @@ QStringList SQLiteDatabase::tables()
 		return res;
 
 	const QString sql = QLatin1String( "SELECT name FROM sqlite_master WHERE type='table' UNION ALL "
-	                                   "SELECT name FROM sqlite_temp_master WHERE type='table'" );
+					   "SELECT name FROM sqlite_temp_master WHERE type='table'" );
 
 	if ( !sql.isEmpty() && execute( sql ) )
 	{
@@ -87,7 +87,7 @@ bool SQLiteDatabase::execute( const QString& queryStr )
 	sqlite3_mutex_enter( sqlite3_db_mutex( m_db ) );
 	const void* pzTail = nullptr;
 	const int res = sqlite3_prepare16_v2( m_db, queryStr.constData(),
-	                                      ( queryStr.size() + 1 ) * sizeof( QChar ), &m_stmt, &pzTail );
+					      ( queryStr.size() + 1 ) * sizeof( QChar ), &m_stmt, &pzTail );
 	sqlite3_mutex_leave( sqlite3_db_mutex( m_db ) );
 
 	if ( res != SQLITE_OK )
@@ -159,7 +159,7 @@ QVariant SQLiteDatabase::value( int index ) const
 
 	default:
 		ret = QString( reinterpret_cast<const QChar*>( sqlite3_column_text16( m_stmt, index ) ),
-		               sqlite3_column_bytes16( m_stmt, index ) / sizeof( QChar ) );
+			       sqlite3_column_bytes16( m_stmt, index ) / sizeof( QChar ) );
 		break;
 	}
 

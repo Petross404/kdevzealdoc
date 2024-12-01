@@ -37,9 +37,9 @@ ZealdocPlugin::ZealdocPlugin( QObject* parent, const QVariantList& )
 {
 	// Connect the signal changedProvidersList to the documentationController's slot
 	connect( this,
-	         &ZealdocPlugin::changedProvidersList,
-	         KDevelop::ICore::self()->documentationController(),
-	         &KDevelop::IDocumentationController::changedDocumentationProviders );
+		 &ZealdocPlugin::changedProvidersList,
+		 KDevelop::ICore::self()->documentationController(),
+		 &KDevelop::IDocumentationController::changedDocumentationProviders );
 
 	// Reload documentation sets upon plugin initialization
 	reloadDocsets();

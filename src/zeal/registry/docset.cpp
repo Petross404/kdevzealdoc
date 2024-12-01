@@ -136,7 +136,7 @@ Docset::Docset( const QString& path ) :
 
 	// TODO: Verify if this is needed
 	if ( plist.contains( QString::fromUtf8( InfoPlist::DashDocSetFamily ) )
-	                && plist[QString::fromUtf8( InfoPlist::DashDocSetFamily )].toString() == QLatin1String( "cheatsheet" ) )
+			&& plist[QString::fromUtf8( InfoPlist::DashDocSetFamily )].toString() == QLatin1String( "cheatsheet" ) )
 	{
 		m_name = m_name + QLatin1String( "cheats" );
 	}
@@ -153,7 +153,7 @@ Docset::Docset( const QString& path ) :
 	}
 
 	sqlite3_create_function( m_db->handle(), "zealScore", 2, SQLITE_UTF8, nullptr, scoreFunc,
-	                         nullptr, nullptr );
+				 nullptr, nullptr );
 
 	m_type = m_db->tables().contains( QStringLiteral( "searchIndex" ) ) ? Type::Dash : Type::ZDash;
 
@@ -293,22 +293,22 @@ QList<SearchResult> Docset::search( const QString& query, const CancellationToke
 	if ( m_type == Docset::Type::Dash )
 	{
 		queryStr = QStringLiteral( "SELECT name, type, path, '', zealScore('%1', name) as score "
-		                           "    FROM searchIndex "
-		                           "WHERE score > 0 "
-		                           "ORDER BY score DESC" ).arg( sanitizedQuery );
+					   "    FROM searchIndex "
+					   "WHERE score > 0 "
+					   "ORDER BY score DESC" ).arg( sanitizedQuery );
 	}
 	else
 	{
 		queryStr = QStringLiteral( "SELECT ztokenname, ztypename, zpath, zanchor, zealScore('%1', ztokenname) as score "
-		                           "    FROM ztoken "
-		                           "LEFT JOIN ztokenmetainformation "
-		                           "    ON ztoken.zmetainformation = ztokenmetainformation.z_pk "
-		                           "LEFT JOIN zfilepath "
-		                           "    ON ztokenmetainformation.zfile = zfilepath.z_pk "
-		                           "LEFT JOIN ztokentype "
-		                           "    ON ztoken.ztokentype = ztokentype.z_pk "
-		                           "WHERE score > 0 "
-		                           "ORDER BY score DESC" ).arg( sanitizedQuery );
+					   "    FROM ztoken "
+					   "LEFT JOIN ztokenmetainformation "
+					   "    ON ztoken.zmetainformation = ztokenmetainformation.z_pk "
+					   "LEFT JOIN zfilepath "
+					   "    ON ztokenmetainformation.zfile = zfilepath.z_pk "
+					   "LEFT JOIN ztokentype "
+					   "    ON ztoken.ztokentype = ztokentype.z_pk "
+					   "WHERE score > 0 "
+					   "ORDER BY score DESC" ).arg( sanitizedQuery );
 	}
 
 	// Limit for very short queries.
@@ -323,10 +323,10 @@ QList<SearchResult> Docset::search( const QString& query, const CancellationToke
 	while ( m_db->next() && !token.isCanceled() )
 	{
 		results.append( {m_db->value( 0 ).toString(),
-		                 parseSymbolType( m_db->value( 1 ).toString() ),
-		                 const_cast<Docset*>( this ),
-		                 createPageUrl( m_db->value( 2 ).toString(), m_db->value( 3 ).toString() ),
-		                 m_db->value( 4 ).toInt()} );
+				 parseSymbolType( m_db->value( 1 ).toString() ),
+				 const_cast<Docset*>( this ),
+				 createPageUrl( m_db->value( 2 ).toString(), m_db->value( 3 ).toString() ),
+				 m_db->value( 4 ).toInt()} );
 	}
 
 	return results;
@@ -352,16 +352,16 @@ QList<SearchResult> Docset::relatedLinks( const QUrl& url ) const
 	if ( m_type == Docset::Type::Dash )
 	{
 		queryStr = QStringLiteral( "SELECT name, type, path FROM searchIndex "
-		                           "WHERE path LIKE \"%1%%\" AND path <> \"%1\"" );
+					   "WHERE path LIKE \"%1%%\" AND path <> \"%1\"" );
 	}
 	else if ( m_type == Docset::Type::ZDash )
 	{
 		queryStr = QStringLiteral( "SELECT ztoken.ztokenname, ztokentype.ztypename, zfilepath.zpath, ztokenmetainformation.zanchor "
-		                           "FROM ztoken "
-		                           "LEFT JOIN ztokenmetainformation ON ztoken.zmetainformation = ztokenmetainformation.z_pk "
-		                           "LEFT JOIN zfilepath ON ztokenmetainformation.zfile = zfilepath.z_pk "
-		                           "LEFT JOIN ztokentype ON ztoken.ztokentype = ztokentype.z_pk "
-		                           "WHERE zfilepath.zpath = \"%1\" AND ztokenmetainformation.zanchor IS NOT NULL" );
+					   "FROM ztoken "
+					   "LEFT JOIN ztokenmetainformation ON ztoken.zmetainformation = ztokenmetainformation.z_pk "
+					   "LEFT JOIN zfilepath ON ztokenmetainformation.zfile = zfilepath.z_pk "
+					   "LEFT JOIN ztokentype ON ztoken.ztokentype = ztokentype.z_pk "
+					   "WHERE zfilepath.zpath = \"%1\" AND ztokenmetainformation.zanchor IS NOT NULL" );
 	}
 
 	m_db->execute( queryStr.arg( cleanUrl.toString() ) );
@@ -369,10 +369,10 @@ QList<SearchResult> Docset::relatedLinks( const QUrl& url ) const
 	while ( m_db->next() )
 	{
 		results.append( {m_db->value( 0 ).toString(),
-		                 parseSymbolType( m_db->value( 1 ).toString() ),
-		                 const_cast<Docset*>( this ),
-		                 createPageUrl( m_db->value( 2 ).toString(), m_db->value( 3 ).toString() ),
-		                 0} );
+				 parseSymbolType( m_db->value( 1 ).toString() ),
+				 const_cast<Docset*>( this ),
+				 createPageUrl( m_db->value( 2 ).toString(), m_db->value( 3 ).toString() ),
+				 0} );
 	}
 
 	if ( results.size() == 1 )
@@ -441,7 +441,7 @@ void Docset::countSymbols()
 	else if ( m_type == Docset::Type::ZDash )
 	{
 		queryStr = QStringLiteral( "SELECT ztypename, COUNT(*) FROM ztoken LEFT JOIN ztokentype"
-		                           " ON ztoken.ztokentype = ztokentype.z_pk GROUP BY ztypename" );
+					   " ON ztoken.ztokentype = ztokentype.z_pk GROUP BY ztypename" );
 	}
 
 	if ( !m_db->execute( queryStr ) )
@@ -477,11 +477,11 @@ void Docset::loadSymbols( const QString& symbolType, const QString& symbolString
 	else
 	{
 		queryStr = QStringLiteral( "SELECT ztokenname, zpath, zanchor "
-		                           "FROM ztoken "
-		                           "LEFT JOIN ztokenmetainformation ON ztoken.zmetainformation = ztokenmetainformation.z_pk "
-		                           "LEFT JOIN zfilepath ON ztokenmetainformation.zfile = zfilepath.z_pk "
-		                           "LEFT JOIN ztokentype ON ztoken.ztokentype = ztokentype.z_pk WHERE ztypename='%1' "
-		                           "ORDER BY ztokenname ASC" );
+					   "FROM ztoken "
+					   "LEFT JOIN ztokenmetainformation ON ztoken.zmetainformation = ztokenmetainformation.z_pk "
+					   "LEFT JOIN zfilepath ON ztokenmetainformation.zfile = zfilepath.z_pk "
+					   "LEFT JOIN ztokentype ON ztoken.ztokentype = ztokentype.z_pk WHERE ztypename='%1' "
+					   "ORDER BY ztokenname ASC" );
 	}
 
 	if ( !m_db->execute( queryStr.arg( symbolString ) ) )
@@ -494,7 +494,7 @@ void Docset::loadSymbols( const QString& symbolType, const QString& symbolString
 
 	while ( m_db->next() )
 		symbols.insert( m_db->value( 0 ).toString(),
-		                createPageUrl( m_db->value( 1 ).toString(), m_db->value( 2 ).toString() ) );
+				createPageUrl( m_db->value( 1 ).toString(), m_db->value( 2 ).toString() ) );
 }
 
 void Docset::createIndex()
@@ -503,13 +503,13 @@ void Docset::createIndex()
 	static const QString indexListQuery{ QStringLiteral( "PRAGMA INDEX_LIST('%1')" ) };
 	static const QString indexDropQuery{ QStringLiteral( "DROP INDEX '%1'" ) };
 	static const QString indexCreateQuery{ QStringLiteral( "CREATE INDEX IF NOT EXISTS %1%2"
-	                                       " ON %3 (%4 COLLATE NOCASE)" ) };
+					       " ON %3 (%4 COLLATE NOCASE)" ) };
 
 	// Determine table and column names based on docset type
 	const QString tableName{ m_type == Type::Dash ? QStringLiteral( "searchIndex" )
-	                         : QStringLiteral( "ztoken" ) };
+				 : QStringLiteral( "ztoken" ) };
 	const QString columnName{ m_type == Type::Dash ? QStringLiteral( "name" )
-	                          : QStringLiteral( "ztokenname" ) };
+				  : QStringLiteral( "ztokenname" ) };
 
 	// Query to list existing indexes on the selected table
 	m_db->execute( indexListQuery.arg( tableName ) );
@@ -539,9 +539,9 @@ void Docset::createIndex()
 
 	// Create a new index for the table on the specified column, using case-insensitive collation
 	m_db->execute( indexCreateQuery.arg( QString::fromLocal8Bit( IndexNamePrefix ),
-	                                     QString::fromLocal8Bit( IndexNameVersion ),
-	                                     tableName,
-	                                     columnName ) );
+					     QString::fromLocal8Bit( IndexNameVersion ),
+					     tableName,
+					     columnName ) );
 }
 
 QUrl Docset::createPageUrl( const QString& path, const QString& fragment ) const
@@ -579,7 +579,7 @@ QUrl Docset::createPageUrl( const QString& path, const QString& fragment ) const
 	{
 		// Special handling for Dash/Apple-style fragments (decode them)
 		if ( realFragment.startsWith( QLatin1String( "//apple_ref" ) ) ||
-		                realFragment.startsWith( QLatin1String( "//dash_ref" ) ) )
+				realFragment.startsWith( QLatin1String( "//dash_ref" ) ) )
 		{
 			url.setFragment( realFragment, QUrl::DecodedMode );
 		}
@@ -730,7 +730,7 @@ QString Docset::parseSymbolType( const QString& str )
 // ported from DevDocs' searcher.coffee:
 // (https://github.com/Thibaut/devdocs/blob/50f583246d5fbd92be7b71a50bfa56cf4e239c14/assets/javascripts/app/searcher.coffee#L91)
 static void matchFuzzy( int nLen, const unsigned char* needle, int hLen,
-                        const unsigned char* haystack, int* start, int* len )
+			const unsigned char* haystack, int* start, int* len )
 {
 	int j = 0;
 	int groups = 0;
@@ -822,7 +822,7 @@ static int scoreExact( int matchIndex, int matchLen, const unsigned char* value,
 				--i;
 
 			score -= ( matchIndex - i ) +                    // (1)
-			         ( valueLen - matchLen - matchIndex ); // (2)
+				 ( valueLen - matchLen - matchIndex ); // (2)
 		}
 
 		// Remove one point for each dot preceding the query, except for the
@@ -914,7 +914,7 @@ static void scoreFunc( sqlite3_context* context, int argc, sqlite3_value** argv 
 		unsigned char c = haystackOrig[i];
 
 		if ( ( i > 0 && haystackOrig[i - 1] == ':' && c == ':' ) // C (::)
-		                || c == '/' || c == '_' || c == ' ' )  // Go, some Guides
+				|| c == '/' || c == '_' || c == ' ' )  // Go, some Guides
 		{
 			haystack[j] = '.';
 		}
@@ -959,12 +959,12 @@ static void scoreFunc( sqlite3_context* context, int argc, sqlite3_value** argv 
 		{
 			int match2 = -1, match2Len;
 			matchFuzzy( needleLen, needle.get(), haystackLen - ( indexOfLastDot + 1 ),
-			            haystack.get() + indexOfLastDot + 1, &match2, &match2Len );
+				    haystack.get() + indexOfLastDot + 1, &match2, &match2Len );
 
 			if ( match2 != -1 )
 			{
 				best = qMax( best, scoreFuzzy( match2, match2Len,
-				                               haystack.get() + indexOfLastDot + 1 ) );
+							       haystack.get() + indexOfLastDot + 1 ) );
 			}
 		}
 	}
