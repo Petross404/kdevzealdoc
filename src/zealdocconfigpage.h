@@ -99,6 +99,6 @@ private:
          */
         void reloadDocsets(const QString& path);
 
-        std::unique_ptr<Ui::ZealdocConfigPage> ui; /*!< The user interface for the configuration page. */
+        std::unique_ptr<Ui::ZealdocConfigPage> m_ui; /*!< The user interface for the configuration page. */
         ZealdocPlugin* m_plugin; /*!< The plugin associated with this configuration page. */
 };

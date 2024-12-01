@@ -35,9 +35,9 @@
 using namespace KDevelop;
 
 ZealdocProvider::ZealdocProvider( const QString& docsetPath, QObject* parent )
-	: QObject( parent )
+	: QObject{ parent }
 {
-	Zeal::Registry::Docset ds( docsetPath );
+	Zeal::Registry::Docset ds{ docsetPath };
 
 	m_isValid = ds.isValid();
 
@@ -51,36 +51,36 @@ ZealdocProvider::ZealdocProvider( const QString& docsetPath, QObject* parent )
 
 	QStringList allTokens;
 
-	auto tokenGroups = ds.symbolCounts();
-	QMapIterator<QString, int> i( tokenGroups );
+	auto tokenGroups{ ds.symbolCounts() };
+	QMapIterator<QString, int> i{ tokenGroups };
 
 	while ( i.hasNext() )
 	{
 		i.next();
 
-		QString groupName = i.key();
-		auto groupTokens = ds.symbols( groupName );
+		QString groupName{ i.key() };
+		auto groupTokens{ ds.symbols( groupName ) };
 
 		if ( !groupTokens.isEmpty() )
 		{
 			m_tokenGroups << groupName;
 		}
 
-		QMapIterator<QString, QUrl> j( groupTokens );
+		QMapIterator<QString, QUrl> j{ groupTokens };
 
 		while ( j.hasNext() )
 		{
 			j.next();
 
-			QString token = j.key();
-			QUrl url = j.value();
+			QString token{ j.key() };
+			QUrl url{ j.value() };
 
 			m_tokenUrls[token] = url;
 			m_groupTokens[groupName] << token;
 		}
 	}
 
-	QMapIterator<QString, QUrl> k( m_tokenUrls );
+	QMapIterator<QString, QUrl> k{ m_tokenUrls };
 
 	while ( k.hasNext() )
 	{
@@ -117,7 +117,7 @@ IDocumentation::Ptr ZealdocProvider::homePage() const
 
 KDevelop::IDocumentation::Ptr ZealdocProvider::documentation( const QUrl& url ) const
 {
-	auto token = m_tokenUrls.key( url );
+	auto token{ m_tokenUrls.key( url ) };
 	return documentationForToken( token );
 }
 
@@ -125,7 +125,7 @@ IDocumentation::Ptr ZealdocProvider::documentationForDeclaration( Declaration* d
 {
 	if ( dec )
 	{
-		static const IndexedString qmlJs( "QML/JS" );
+		static const IndexedString qmlJs{ "QML/JS" };
 		QString token;
 
 		{
@@ -153,7 +153,7 @@ KDevelop::IDocumentation::Ptr ZealdocProvider::documentationForToken( const QStr
 {
 	if ( !token.isEmpty() )
 	{
-		const QUrl url = m_tokenUrls[token];
+		const QUrl url{ m_tokenUrls[token] };
 
 		if ( url.isValid() )
 		{

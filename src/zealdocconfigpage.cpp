@@ -30,26 +30,26 @@
 #include <KMessageWidget>
 
 ZealdocConfigPage::ZealdocConfigPage( KDevelop::IPlugin* plugin, QWidget* parent )
-	: ConfigPage( plugin, nullptr, parent )
-	, ui( std::make_unique<Ui::ZealdocConfigPage>() )
-	, m_plugin( dynamic_cast<ZealdocPlugin*>( plugin ) )
+	: ConfigPage{ plugin, nullptr, parent }
+	, m_ui{ std::make_unique<Ui::ZealdocConfigPage>() }
+	, m_plugin{ dynamic_cast<ZealdocPlugin*>( plugin ) }
 {
-	ui->setupUi( this );
+	m_ui->setupUi( this );
 
-	ui->kcfg_docsetsPath->setText( docsetsPath() );
-	ui->kcfg_docsetsPath->lineEdit()->setReadOnly( true );
+	m_ui->kcfg_docsetsPath->setText( docsetsPath() );
+	m_ui->kcfg_docsetsPath->lineEdit()->setReadOnly( true );
 
 	if ( docsetsPath().isEmpty() )
 	{
-		auto* w = new KMessageWidget( i18n( "Have you installed Zeal and/or any docsets?" ), this );
+		auto* w{ new KMessageWidget( i18n( "Have you installed Zeal and/or any docsets?" ), this ) };
 		w->show();
 	}
 
 	reloadDocsets( docsetsPath() );
 
-	connect( ui->docsetsList, &QListWidget::itemChanged, this, [this]( QListWidgetItem* ) { emit changed(); } );
+	connect( m_ui->docsetsList, &QListWidget::itemChanged, this, [this]( QListWidgetItem* ) { emit changed(); } );
 
-	connect( ui->kcfg_docsetsPath, &KUrlRequester::textChanged,
+	connect( m_ui->kcfg_docsetsPath, &KUrlRequester::textChanged,
 	this, [this]( const QString & path ) { reloadDocsets( path ); } );
 }
 
@@ -57,9 +57,9 @@ ZealdocConfigPage::~ZealdocConfigPage() = default;
 
 void ZealdocConfigPage::reloadDocsets( const QString& path )
 {
-	auto enabled = enabledDocsets();
+	auto enabled{ enabledDocsets() };
 
-	ui->docsetsList->clear();
+	m_ui->docsetsList->clear();
 
 	for ( const auto& docsetInformation : availableDocsets( path ) )
 	{
@@ -68,7 +68,7 @@ void ZealdocConfigPage::reloadDocsets( const QString& path )
 			continue;
 		}
 
-		auto item = new QListWidgetItem( ui->docsetsList );
+		auto item{ new QListWidgetItem( m_ui->docsetsList ) };
 		item->setText( docsetInformation.title );
 		item->setIcon( docsetInformation.icon );
 
@@ -107,9 +107,9 @@ void ZealdocConfigPage::apply()
 {
 	QStringList enabled;
 
-	for ( int i = 0; i < ui->docsetsList->count(); i++ )
+	for ( int i = 0; i < m_ui->docsetsList->count(); i++ )
 	{
-		auto item = ui->docsetsList->item( i );
+		auto item{ m_ui->docsetsList->item( i ) };
 
 		if ( item->checkState() == Qt::Checked )
 		{
@@ -118,7 +118,7 @@ void ZealdocConfigPage::apply()
 	}
 
 	KConfigGroup config{ KSharedConfig::openConfig(),"Zealdoc" };
-	config.writeEntry( QStringLiteral( "DocsetsPath" ), ui->kcfg_docsetsPath->text() );
+	config.writeEntry( QStringLiteral( "DocsetsPath" ), m_ui->kcfg_docsetsPath->text() );
 	config.writeEntry( QStringLiteral( "EnabledDocsets" ), enabled );
 
 	m_plugin->reloadDocsets();
@@ -126,12 +126,12 @@ void ZealdocConfigPage::apply()
 
 void ZealdocConfigPage::defaults()
 {
-	QSignalBlocker blocker( this );
-	ui->kcfg_docsetsPath->setText( defaultDocsetsPath() );
+	QSignalBlocker blocker{ this };
+	m_ui->kcfg_docsetsPath->setText( defaultDocsetsPath() );
 
-	for ( int i = 0; i < ui->docsetsList->count(); i++ )
+	for ( int i = 0; i < m_ui->docsetsList->count(); i++ )
 	{
-		ui->docsetsList->item( i )->setCheckState( Qt::Unchecked );
+		m_ui->docsetsList->item( i )->setCheckState( Qt::Unchecked );
 	}
 }
 

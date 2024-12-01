@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 3.20)
 
 project(kdevzealdoc VERSION 0.0.1 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 find_package(ECM REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH})
@@ -33,6 +34,10 @@ add_definitions(-DTRANSLATION_DOMAIN=\"kdevzealdoc\")
 include_directories(
     src/
     src/zeal/
+)
+
+set(kdevzealdoc_UI_SRCS
+    src/zealdocconfigpage.ui
 )
 
 set(kdevzealdoc_SRCS

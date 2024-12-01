@@ -411,7 +411,7 @@ void Docset::loadMetadata()
 	m_version = jsonObject[QStringLiteral( "version" )].toString();
 	m_revision = jsonObject[QStringLiteral( "revision" )].toString();
 
-	qDebug() << QString{"Name: %1, Title: %2, Version: %3, Revision: %4"}.arg(m_name).arg(m_title).arg(m_version).arg(m_revision);
+	qDebug() << QString{"Name: %1, Title: %2, Version: %3, Revision: %4"}.arg( m_name ).arg( m_title ).arg( m_version ).arg( m_revision );
 
 	if ( jsonObject.contains( QStringLiteral( "extra" ) ) )
 	{
@@ -494,43 +494,50 @@ void Docset::loadSymbols( const QString& symbolType, const QString& symbolString
 
 	while ( m_db->next() )
 		symbols.insert( m_db->value( 0 ).toString(),
-		                     createPageUrl( m_db->value( 1 ).toString(), m_db->value( 2 ).toString() ) );
+		                createPageUrl( m_db->value( 1 ).toString(), m_db->value( 2 ).toString() ) );
 }
 
 void Docset::createIndex()
 {
+	// Define SQL queries for index operations
 	static const QString indexListQuery{ QStringLiteral( "PRAGMA INDEX_LIST('%1')" ) };
 	static const QString indexDropQuery{ QStringLiteral( "DROP INDEX '%1'" ) };
 	static const QString indexCreateQuery{ QStringLiteral( "CREATE INDEX IF NOT EXISTS %1%2"
-	                                        " ON %3 (%4 COLLATE NOCASE)" ) };
+	                                       " ON %3 (%4 COLLATE NOCASE)" ) };
 
+	// Determine table and column names based on docset type
 	const QString tableName{ m_type == Type::Dash ? QStringLiteral( "searchIndex" )
-	                          : QStringLiteral( "ztoken" ) };
-
+	                         : QStringLiteral( "ztoken" ) };
 	const QString columnName{ m_type == Type::Dash ? QStringLiteral( "name" )
-	                           : QStringLiteral( "ztokenname" ) };
+	                          : QStringLiteral( "ztokenname" ) };
 
+	// Query to list existing indexes on the selected table
 	m_db->execute( indexListQuery.arg( tableName ) );
 
-	QStringList oldIndexes;
+	QStringList oldIndexes; // To store the names of outdated indexes
 
+	// Iterate over the results of the index list query
 	while ( m_db->next() )
 	{
-		const QString indexName{ m_db->value( 1 ).toString() };
+		const QString indexName{ m_db->value( 1 ).toString() }; // Get the index name from the query result
 
+		// Skip indexes that do not belong to Zeal (not starting with the expected prefix)
 		if ( !indexName.startsWith( QString::fromLocal8Bit( IndexNamePrefix ) ) )
 			continue;
 
+		// If the index matches the current version, no further action is needed
 		if ( indexName.endsWith( QString::fromLocal8Bit( IndexNameVersion ) ) )
 			return;
 
+		// Add outdated index names to the list for removal
 		oldIndexes << indexName;
 	}
 
-	// Drop old indexes
+	// Drop all outdated indexes
 	for ( const QString& oldIndexName : oldIndexes )
 		m_db->execute( indexDropQuery.arg( oldIndexName ) );
 
+	// Create a new index for the table on the specified column, using case-insensitive collation
 	m_db->execute( indexCreateQuery.arg( QString::fromLocal8Bit( IndexNamePrefix ),
 	                                     QString::fromLocal8Bit( IndexNameVersion ),
 	                                     tableName,
@@ -542,41 +549,51 @@ QUrl Docset::createPageUrl( const QString& path, const QString& fragment ) const
 	QString realPath;
 	QString realFragment;
 
+	// Handle cases where the fragment is part of the path (separated by '#')
 	if ( fragment.isEmpty() )
 	{
 		const QStringList urlParts{ path.split( QLatin1Char( '#' ) ) };
-		realPath = urlParts[0];
+		realPath = urlParts[0]; // Extract the main path
 
+		// If there is a fragment part, extract it
 		if ( urlParts.size() > 1 )
 			realFragment = urlParts[1];
 	}
 	else
 	{
+		// Use the provided path and fragment directly
 		realPath = path;
 		realFragment = fragment;
 	}
 
+	// Remove special Dash-specific placeholders from the path and fragment
 	static const QRegularExpression dashEntryRegExp{ QLatin1String{ "<dash_entry_.*>" } };
 	realPath.remove( dashEntryRegExp );
 	realFragment.remove( dashEntryRegExp );
 
+	// Construct a file-based URL pointing to the document path
 	QUrl url{ QUrl::fromLocalFile( QDir( documentPath() ).absoluteFilePath( realPath ) ) };
 
+	// Set the fragment (anchor) for the URL if available
 	if ( !realFragment.isEmpty() )
 	{
-		if ( realFragment.startsWith( QLatin1String( "//apple_ref" ) )
-		                || realFragment.startsWith( QLatin1String( "//dash_ref" ) ) )
+		// Special handling for Dash/Apple-style fragments (decode them)
+		if ( realFragment.startsWith( QLatin1String( "//apple_ref" ) ) ||
+		                realFragment.startsWith( QLatin1String( "//dash_ref" ) ) )
 		{
 			url.setFragment( realFragment, QUrl::DecodedMode );
 		}
 		else
 		{
+			// Set a regular fragment
 			url.setFragment( realFragment );
 		}
 	}
 
+	// Return the fully constructed URL
 	return url;
 }
+
 
 QString Docset::parseSymbolType( const QString& str )
 {
@@ -879,8 +896,8 @@ static void scoreFunc( sqlite3_context* context, int argc, sqlite3_value** argv 
 	while ( needleOrig[needleLen] != 0 )
 		++needleLen;
 
-	std::unique_ptr<unsigned char[]> needle(new unsigned char[needleLen + 1]);
-	std::unique_ptr<unsigned char[]> haystack(new unsigned char[haystackLen + 1]);
+	std::unique_ptr<unsigned char[]> needle( new unsigned char[needleLen + 1] );
+	std::unique_ptr<unsigned char[]> haystack( new unsigned char[haystackLen + 1] );
 
 	for ( int i = 0; i < needleLen + 1; ++i )
 	{
