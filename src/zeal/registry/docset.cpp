@@ -63,28 +63,37 @@ const char DocSetPlatformFamily[] = "DocSetPlatformFamily";
 }
 
 Docset::Docset( const QString& path ) :
-	m_path( path ),
-	m_documentPath( QDir( m_path ).absoluteFilePath( QStringLiteral( "Contents/Resources/Documents" ) ) )
+	m_path{ path },
+	m_documentPath{ QDir( m_path ).absoluteFilePath( QStringLiteral( "Contents/Resources/Documents" ) ) }
 {
-	QDir dir( m_path );
+	QDir dir{ m_path };
 
 	if ( !dir.exists() )
+	{
+		qWarning() << "Dir: " << dir.path() << " is not existant";
 		return;
+	}
 
 	loadMetadata();
 
 	// Attempt to find the icon in any supported format
 	for ( const QString& iconFile : dir.entryList( {QStringLiteral( "icon.*" )}, QDir::Files ) )
 	{
-		m_icon = QIcon( dir.absoluteFilePath( iconFile ) );
+		m_icon = QIcon{ dir.absoluteFilePath( iconFile ) };
 
 		if ( !m_icon.availableSizes().isEmpty() )
+		{
+			qWarning() << "Icon: " << m_icon.name() << " doesn't have availabe size()";
 			break;
+		}
 	}
 
 	// TODO: Report errors here and below
 	if ( !dir.cd( QStringLiteral( "Contents" ) ) )
+	{
+		qWarning() << "Can't cd in directory: " << dir.dirName();
 		return;
+	}
 
 	// TODO: 'info.plist' is invalid according to Apple, and must alsways be 'Info.plist'
 	// https://developer.apple.com/library/mac/documentation/MacOSX/Conceptual/BPRuntimeConfig
@@ -99,7 +108,10 @@ Docset::Docset( const QString& path ) :
 		return;
 
 	if ( plist.hasError() )
+	{
+		qWarning() << "Plist has error";
 		return;
+	}
 
 	if ( m_name.isEmpty() )
 	{
@@ -132,7 +144,7 @@ Docset::Docset( const QString& path ) :
 	if ( !dir.cd( QStringLiteral( "Resources" ) ) || !dir.exists( QStringLiteral( "docSet.dsidx" ) ) )
 		return;
 
-	m_db = new Util::SQLiteDatabase( dir.absoluteFilePath( QStringLiteral( "docSet.dsidx" ) ) );
+	m_db.reset( std::make_unique<Util::SQLiteDatabase>( dir.absoluteFilePath( QStringLiteral( "docSet.dsidx" ) ) ).release() );
 
 	if ( !m_db->isOpen() )
 	{
@@ -189,10 +201,7 @@ Docset::Docset( const QString& path ) :
 	countSymbols();
 }
 
-Docset::~Docset()
-{
-	delete m_db;
-}
+Docset::~Docset() = default;
 
 bool Docset::isValid() const
 {
@@ -241,9 +250,9 @@ QIcon Docset::icon() const
 
 QIcon Docset::symbolTypeIcon( const QString& symbolType ) const
 {
-	static const QIcon unknownIcon( QStringLiteral( "typeIcon:Unknown.png" ) );
+	static const QIcon unknownIcon{ QStringLiteral( "typeIcon:Unknown.png" ) };
 
-	const QIcon icon( QStringLiteral( "typeIcon:%1.png" ).arg( symbolType ) );
+	const QIcon icon{ QStringLiteral( "typeIcon:%1.png" ).arg( symbolType ) };
 	return icon.availableSizes().isEmpty() ? unknownIcon : icon;
 }
 
@@ -328,14 +337,14 @@ QList<SearchResult> Docset::relatedLinks( const QUrl& url ) const
 	QList<SearchResult> results;
 
 	// Strip docset path and anchor from url
-	const QString dir = documentPath();
-	QString urlPath = url.path();
-	int dirPosition = urlPath.indexOf( dir );
-	QString path = url.path().mid( dirPosition + dir.size() + 1 );
+	const QString dir{ documentPath() };
+	QString urlPath{ url.path() };
+	int dirPosition{ urlPath.indexOf( dir ) };
+	QString path{ url.path().mid( dirPosition + dir.size() + 1 ) };
 
 	// Get the url without the #anchor.
-	QUrl cleanUrl( path );
-	cleanUrl.setFragment( QString() );
+	QUrl cleanUrl{ path };
+	cleanUrl.setFragment( QString{} );
 
 	// Prepare the query to look up all pages with the same url.
 	QString queryStr;
@@ -380,21 +389,29 @@ void Docset::loadMetadata()
 	if ( !dir.exists( QStringLiteral( "meta.json" ) ) )
 		return;
 
-	QScopedPointer<QFile> file( new QFile( dir.filePath( QStringLiteral( "meta.json" ) ) ) );
+	std::unique_ptr<QFile> file{ std::make_unique<QFile>( dir.filePath( QStringLiteral( "meta.json" ) ) ) };
 
 	if ( !file->open( QIODevice::ReadOnly ) )
+	{
+		qWarning() << "File: " << file->fileName() << " couldn't be opened.";
 		return;
+	}
 
 	QJsonParseError jsonError;
 	const QJsonObject jsonObject = QJsonDocument::fromJson( file->readAll(), &jsonError ).object();
 
 	if ( jsonError.error != QJsonParseError::NoError )
+	{
+		qWarning() << "JSON error is: " << jsonError.errorString();
 		return;
+	}
 
 	m_name = jsonObject[QStringLiteral( "name" )].toString();
 	m_title = jsonObject[QStringLiteral( "title" )].toString();
 	m_version = jsonObject[QStringLiteral( "version" )].toString();
 	m_revision = jsonObject[QStringLiteral( "revision" )].toString();
+
+	qDebug() << QString{"Name: %1, Title: %2, Version: %3, Revision: %4"}.arg(m_name).arg(m_title).arg(m_version).arg(m_revision);
 
 	if ( jsonObject.contains( QStringLiteral( "extra" ) ) )
 	{
@@ -437,7 +454,7 @@ void Docset::countSymbols()
 	{
 		const QString symbolTypeStr = m_db->value( 0 ).toString();
 		const QString symbolType = parseSymbolType( symbolTypeStr );
-		m_symbolStrings.insertMulti( symbolType, symbolTypeStr );
+		m_symbolStrings.insert( symbolType, symbolTypeStr );
 		m_symbolCounts[symbolType] = m_db->value( 1 ).toInt();
 	}
 }
@@ -473,24 +490,25 @@ void Docset::loadSymbols( const QString& symbolType, const QString& symbolString
 		return;
 	}
 
-	QMap<QString, QUrl>& symbols = m_symbols[symbolType];
+	QMultiMap<QString, QUrl>& symbols = m_symbols[symbolType];
 
 	while ( m_db->next() )
-		symbols.insertMulti( m_db->value( 0 ).toString(),
+		symbols.insert( m_db->value( 0 ).toString(),
 		                     createPageUrl( m_db->value( 1 ).toString(), m_db->value( 2 ).toString() ) );
 }
 
 void Docset::createIndex()
 {
-	static const QString indexListQuery = QStringLiteral( "PRAGMA INDEX_LIST('%1')" );
-	static const QString indexDropQuery = QStringLiteral( "DROP INDEX '%1'" );
-	static const QString indexCreateQuery = QStringLiteral( "CREATE INDEX IF NOT EXISTS %1%2"
-	                                        " ON %3 (%4 COLLATE NOCASE)" );
+	static const QString indexListQuery{ QStringLiteral( "PRAGMA INDEX_LIST('%1')" ) };
+	static const QString indexDropQuery{ QStringLiteral( "DROP INDEX '%1'" ) };
+	static const QString indexCreateQuery{ QStringLiteral( "CREATE INDEX IF NOT EXISTS %1%2"
+	                                        " ON %3 (%4 COLLATE NOCASE)" ) };
 
-	const QString tableName = m_type == Type::Dash ? QStringLiteral( "searchIndex" )
-	                          : QStringLiteral( "ztoken" );
-	const QString columnName = m_type == Type::Dash ? QStringLiteral( "name" )
-	                           : QStringLiteral( "ztokenname" );
+	const QString tableName{ m_type == Type::Dash ? QStringLiteral( "searchIndex" )
+	                          : QStringLiteral( "ztoken" ) };
+
+	const QString columnName{ m_type == Type::Dash ? QStringLiteral( "name" )
+	                           : QStringLiteral( "ztokenname" ) };
 
 	m_db->execute( indexListQuery.arg( tableName ) );
 
@@ -498,7 +516,7 @@ void Docset::createIndex()
 
 	while ( m_db->next() )
 	{
-		const QString indexName = m_db->value( 1 ).toString();
+		const QString indexName{ m_db->value( 1 ).toString() };
 
 		if ( !indexName.startsWith( QString::fromLocal8Bit( IndexNamePrefix ) ) )
 			continue;
@@ -526,7 +544,7 @@ QUrl Docset::createPageUrl( const QString& path, const QString& fragment ) const
 
 	if ( fragment.isEmpty() )
 	{
-		const QStringList urlParts = path.split( QLatin1Char( '#' ) );
+		const QStringList urlParts{ path.split( QLatin1Char( '#' ) ) };
 		realPath = urlParts[0];
 
 		if ( urlParts.size() > 1 )
@@ -538,11 +556,11 @@ QUrl Docset::createPageUrl( const QString& path, const QString& fragment ) const
 		realFragment = fragment;
 	}
 
-	static const QRegularExpression dashEntryRegExp( QLatin1String( "<dash_entry_.*>" ) );
+	static const QRegularExpression dashEntryRegExp{ QLatin1String{ "<dash_entry_.*>" } };
 	realPath.remove( dashEntryRegExp );
 	realFragment.remove( dashEntryRegExp );
 
-	QUrl url = QUrl::fromLocalFile( QDir( documentPath() ).absoluteFilePath( realPath ) );
+	QUrl url{ QUrl::fromLocalFile( QDir( documentPath() ).absoluteFilePath( realPath ) ) };
 
 	if ( !realFragment.isEmpty() )
 	{
@@ -861,8 +879,8 @@ static void scoreFunc( sqlite3_context* context, int argc, sqlite3_value** argv 
 	while ( needleOrig[needleLen] != 0 )
 		++needleLen;
 
-	QScopedArrayPointer<unsigned char> needle( new unsigned char[needleLen + 1] );
-	QScopedArrayPointer<unsigned char> haystack( new unsigned char[haystackLen + 1] );
+	std::unique_ptr<unsigned char[]> needle(new unsigned char[needleLen + 1]);
+	std::unique_ptr<unsigned char[]> haystack(new unsigned char[haystackLen + 1]);
 
 	for ( int i = 0; i < needleLen + 1; ++i )
 	{
@@ -896,7 +914,7 @@ static void scoreFunc( sqlite3_context* context, int argc, sqlite3_value** argv 
 	int match1 = -1;
 	int match1Len;
 
-	matchFuzzy( needleLen, needle.data(), haystackLen, haystack.data(), &match1, &match1Len );
+	matchFuzzy( needleLen, needle.get(), haystackLen, haystack.get(), &match1, &match1Len );
 
 	if ( match1 == -1 ) // no match
 	{
@@ -906,11 +924,11 @@ static void scoreFunc( sqlite3_context* context, int argc, sqlite3_value** argv 
 	}
 	else if ( needleLen == match1Len )   // exact match
 	{
-		best = scoreExact( match1, match1Len, haystack.data(), haystackLen );
+		best = scoreExact( match1, match1Len, haystack.get(), haystackLen );
 	}
 	else
 	{
-		best = scoreFuzzy( match1, match1Len, haystack.data() );
+		best = scoreFuzzy( match1, match1Len, haystack.get() );
 
 		int indexOfLastDot = -1;
 
@@ -923,13 +941,13 @@ static void scoreFunc( sqlite3_context* context, int argc, sqlite3_value** argv 
 		if ( indexOfLastDot != -1 )
 		{
 			int match2 = -1, match2Len;
-			matchFuzzy( needleLen, needle.data(), haystackLen - ( indexOfLastDot + 1 ),
-			            haystack.data() + indexOfLastDot + 1, &match2, &match2Len );
+			matchFuzzy( needleLen, needle.get(), haystackLen - ( indexOfLastDot + 1 ),
+			            haystack.get() + indexOfLastDot + 1, &match2, &match2Len );
 
 			if ( match2 != -1 )
 			{
 				best = qMax( best, scoreFuzzy( match2, match2Len,
-				                               haystack.data() + indexOfLastDot + 1 ) );
+				                               haystack.get() + indexOfLastDot + 1 ) );
 			}
 		}
 	}

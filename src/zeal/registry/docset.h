@@ -25,18 +25,22 @@
 #ifndef DOCSET_H
 #define DOCSET_H
 
+#include <util/sqlitedatabase.h>
+
 #include <QIcon>
 #include <QMap>
 #include <QMetaObject>
 #include <QUrl>
 
+#include <memory>
+
 namespace Zeal
 {
 
-namespace Util
-{
-class SQLiteDatabase;
-}
+// namespace Util
+// {
+// class SQLiteDatabase;
+// }
 
 namespace Registry
 {
@@ -104,10 +108,10 @@ private:
 
         QUrl m_indexFileUrl;
 
-        QMap<QString, QString> m_symbolStrings;
+        QMultiMap<QString, QString> m_symbolStrings;
         QMap<QString, int> m_symbolCounts;
-        mutable QMap<QString, QMap<QString, QUrl>> m_symbols;
-        Util::SQLiteDatabase* m_db = nullptr;
+        mutable QMap<QString, QMultiMap<QString, QUrl>> m_symbols;
+        std::unique_ptr<Util::SQLiteDatabase> m_db = nullptr;
 };
 
 } // namespace Registry
