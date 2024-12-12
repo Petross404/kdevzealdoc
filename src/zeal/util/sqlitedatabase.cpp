@@ -170,14 +170,14 @@ QString Zeal::Util::SQLiteDatabase::lastError() const { return m_lastError; }
 
 void Zeal::Util::SQLiteDatabase::close()
 {
-	sqlite3_close( m_db.get() );
-	m_db = nullptr;
+	// sqlite3_close( m_db.get() );
+	// m_db = nullptr;
 }
 
 void Zeal::Util::SQLiteDatabase::finalize()
 {
-	sqlite3_finalize( m_stmt.get() );
-	m_stmt = nullptr;
+	// sqlite3_finalize( m_stmt.get() );
+	// m_stmt = nullptr;
 }
 
 void Zeal::Util::SQLiteDatabase::updateLastError()
