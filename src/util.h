@@ -1,5 +1,5 @@
 /* This file is part of KDevelop
- *  Copyright 2016 Anton Anikin <anton.anikin@htower.ru>                                 *
+ *  Copyright 2016 Anton Anikin <anton.anikin@htower.ru> *
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include <QList>
 #include <QIcon>
+#include <QList>
 #include <QStringList>
 
 /*!
@@ -29,11 +29,12 @@
  *
  * This structure holds the path, title, icon, and validity status of a documentation set.
  */
-struct DocsetInformation {
-        QString path; /*!< The file path to the documentation set. */
-        QString title; /*!< The title of the documentation set. */
-        QIcon icon; /*!< The icon representing the documentation set. */
-        bool isValid; /*!< A flag indicating whether the documentation set is valid. */
+struct DocsetInformation
+{
+	QString path;  /*!< The file path to the documentation set. */
+	QString title; /*!< The title of the documentation set. */
+	QIcon	icon;  /*!< The icon representing the documentation set. */
+	bool isValid;  /*!< A flag indicating whether the documentation set is valid. */
 };
 
 /*!
@@ -59,4 +60,4 @@ QStringList enabledDocsets();
  * \param docsetsPath The path to search for documentation sets. Defaults to the current documentation path.
  * \return A list of DocsetInformation structures representing the available documentation sets.
  */
-QList<DocsetInformation> availableDocsets ( const QString& docsetsPath = docsetsPath() );
+QList<DocsetInformation> availableDocsets( const QString& docsetsPath = docsetsPath() );

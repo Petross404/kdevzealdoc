@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include <interfaces/iplugin.h>
 #include <interfaces/idocumentationproviderprovider.h>
+#include <interfaces/iplugin.h>
 
 #include <QObject>
 
@@ -32,55 +32,58 @@ class ZealdocProvider;
  * This class implements the KDevelop::IPlugin interface to integrate with KDevelop's plugin system
  * and KDevelop::IDocumentationProviderProvider to provide documentation providers.
  */
-class ZealdocPlugin : public KDevelop::IPlugin, public KDevelop::IDocumentationProviderProvider
+class ZealdocPlugin
+	: public KDevelop::IPlugin
+	, public KDevelop::IDocumentationProviderProvider
 {
-        Q_OBJECT
-        Q_INTERFACES(KDevelop::IDocumentationProviderProvider)
+	Q_OBJECT
+	Q_DISABLE_COPY_MOVE( ZealdocPlugin )
+	Q_INTERFACES( KDevelop::IDocumentationProviderProvider )
 
 public:
-        /*!
-         * \brief Constructs a ZealdocPlugin object.
-         * \param parent The parent object.
-         * \param args List of arguments passed during initialization.
-         */
-        ZealdocPlugin(QObject* parent, const QVariantList& args);
+	/*!
+	 * \brief Constructs a ZealdocPlugin object.
+	 * \param parent The parent object.
+	 * \param args List of arguments passed during initialization.
+	 */
+	ZealdocPlugin( QObject* parent, const QVariantList& args );
 
-        /*!
-         * \brief Destroys the ZealdocPlugin object.
-         */
-        ~ZealdocPlugin() override;
+	/*!
+	 * \brief Destroys the ZealdocPlugin object.
+	 */
+	~ZealdocPlugin() override;
 
-        /*!
-         * \brief Returns the list of documentation providers.
-         * \return List of documentation providers.
-         */
-        QList<KDevelop::IDocumentationProvider*> providers() override;
+	/*!
+	 * \brief Returns the list of documentation providers.
+	 * \return List of documentation providers.
+	 */
+	QList<KDevelop::IDocumentationProvider*> providers() override;
 
-        /*!
-         * \brief Returns the number of configuration pages provided by the plugin.
-         * \return Number of configuration pages.
-         */
-        [[nodiscard]] int configPages() const override;
+	/*!
+	 * \brief Returns the number of configuration pages provided by the plugin.
+	 * \return Number of configuration pages.
+	 */
+	[[nodiscard]] int configPages() const override;
 
-        /*!
-         * \brief Returns a configuration page for the specified number.
-         * \param number The index of the configuration page to retrieve.
-         * \param parent The parent widget for the configuration page.
-         * \return Configuration page object.
-         */
-        KDevelop::ConfigPage* configPage(int number, QWidget* parent) override;
+	/*!
+	 * \brief Returns a configuration page for the specified number.
+	 * \param number The index of the configuration page to retrieve.
+	 * \param parent The parent widget for the configuration page.
+	 * \return Configuration page object.
+	 */
+	KDevelop::ConfigPage* configPage( int number, QWidget* parent ) override;
 
-        /*!
-         * \brief Reloads the documentation sets and updates the providers.
-         */
-        void reloadDocsets();
+	/*!
+	 * \brief Reloads the documentation sets and updates the providers.
+	 */
+	void reloadDocsets();
 
 Q_SIGNALS:
-        /*!
-         * \brief Signal emitted when the list of documentation providers changes.
-         */
-        void changedProvidersList() override;
+	/*!
+	 * \brief Signal emitted when the list of documentation providers changes.
+	 */
+	void changedProvidersList() override;
 
 private:
-        QList<ZealdocProvider*> m_providers; /*!< List of documentation providers managed by the plugin. */
+	QList<ZealdocProvider*> m_providers; /*!< List of documentation providers managed by the plugin. */
 };

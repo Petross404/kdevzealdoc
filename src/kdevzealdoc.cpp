@@ -18,16 +18,17 @@
  */
 
 #include "kdevzealdoc.h"
-#include "zealdocprovider.h"
-#include "zealdocconfigpage.h"
-#include "util.h"
-#include "debug.h"
 
 #include <interfaces/icore.h>
 #include <interfaces/idocumentationcontroller.h>
 
-#include <KPluginFactory>
 #include <KLocalizedString>
+#include <KPluginFactory>
+
+#include "debug.h"
+#include "util.h"
+#include "zealdocconfigpage.h"
+#include "zealdocprovider.h"
 
 // Factory registration for the ZealdocPlugin class using JSON configuration
 K_PLUGIN_FACTORY_WITH_JSON( ZealdocFactory, "kdevzealdoc.json", registerPlugin<ZealdocPlugin>(); )
@@ -51,25 +52,25 @@ ZealdocPlugin::~ZealdocPlugin() = default;
 // Reloads documentation sets based on enabled docsets
 void ZealdocPlugin::reloadDocsets()
 {
-	QStringList enabled = enabledDocsets(); // Retrieve enabled documentation sets
-	QStringList loaded; // List of currently loaded docsets
-	bool hasChanges = false; // Flag to track changes in providers list
+	const QStringList enabled{ enabledDocsets() };	  // Retrieve enabled documentation sets
+	QStringList loaded;		   // List of currently loaded docsets
+	bool	    hasChanges = false;	   // Flag to track changes in providers list
 
 	// First, unload disabled docsets
 	QMutableListIterator<ZealdocProvider*> i( m_providers );
 
 	while ( i.hasNext() )
 	{
-		auto provider = i.next();
+		ZealdocProvider* provider{ i.next() };
 
 		if ( !enabled.contains( provider->name() ) )
 		{
-			i.remove(); // Remove provider from list
-			hasChanges = true; // Indicate changes were made
+			i.remove();	      // Remove provider from list
+			hasChanges = true;    // Indicate changes were made
 		}
 		else
 		{
-			loaded << provider->name(); // Store name of loaded provider
+			loaded << provider->name();    // Store name of loaded provider
 		}
 	}
 
@@ -78,29 +79,29 @@ void ZealdocPlugin::reloadDocsets()
 	{
 		if ( !enabled.contains( docsetInformation.title ) )
 		{
-			continue; // Skip docsets not enabled
+			continue;    // Skip docsets not enabled
 		}
 
 		if ( loaded.contains( docsetInformation.title ) )
 		{
-			continue; // Skip docsets already loaded
+			continue;    // Skip docsets already loaded
 		}
 
 		auto docset = new ZealdocProvider( docsetInformation.path, this );
 
 		if ( !docset->isValid() )
 		{
-			delete docset; // Clean up invalid docset objects
+			delete docset;	  // Clean up invalid docset objects
 			continue;
 		}
 
-		m_providers << docset; // Add valid docset provider to list
-		hasChanges = true; // Indicate changes were made
+		m_providers << docset;	  // Add valid docset provider to list
+		hasChanges = true;	  // Indicate changes were made
 	}
 
 	if ( !hasChanges )
 	{
-		emit changedProvidersList(); // Emit signal if providers list was modified
+		emit changedProvidersList();	// Emit signal if providers list was modified
 	}
 }
 
@@ -111,27 +112,24 @@ QList<KDevelop::IDocumentationProvider*> ZealdocPlugin::providers()
 
 	for ( const auto p : m_providers )
 	{
-		result << p; // Populate result with each provider
+		result << p;	// Populate result with each provider
 	}
 
-	return result; // Return list of providers
+	return result;	  // Return list of providers
 }
 
 // Returns the number of configuration pages provided by the plugin (always 1)
-int ZealdocPlugin::configPages() const
-{
-	return 1;
-}
+int ZealdocPlugin::configPages() const { return 1; }
 
 // Returns the configuration page for the specified number (only one page supported)
 KDevelop::ConfigPage* ZealdocPlugin::configPage( int number, QWidget* parent )
 {
 	if ( number )
 	{
-		return nullptr; // Return nullptr if number is not 0 (only one page supported)
+		return nullptr;	   // Return nullptr if number is not 0 (only one page supported)
 	}
 
-	return new ZealdocConfigPage( this, parent ); // Create and return configuration page
+	return new ZealdocConfigPage{ this, parent };	 // Create and return configuration page
 }
 
 // Required for QObject class created from K_PLUGIN_FACTORY_WITH_JSON

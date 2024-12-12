@@ -1,36 +1,35 @@
 /* This file is part of KDevelop
-  **  Copyright 2016 Anton Anikin <anton.anikin@htower.ru>
-  *
-  *  This program is free software; you can redistribute it and/or
-  *  modify it under the terms of the GNU General Public
-  *  License as published by the Free Software Foundation; either
-  *  version 2 of the License, or (at your option) any later version.
-  *
-  *  This program is distributed in the hope that it will be useful,
-  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  *  General Public License for more details.
-  *
-  *  You should have received a copy of the GNU General Public License
-  *  along with this program; see the file COPYING.  If not, write to
-  *  the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-  *  Boston, MA 02110-1301, USA.
-  */
+ **  Copyright 2016 Anton Anikin <anton.anikin@htower.ru>
+ *
+ *  This program is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2 of the License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ *  General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; see the file COPYING.  If not, write to
+ *  the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ *  Boston, MA 02110-1301, USA.
+ */
 
 #include "zealdocprovider.h"
-#include "zealdocumentation.h"
-#include "debug.h"
 
-#include "registry/docset.h"
-
+#include <language/duchain/declaration.h>
 #include <language/duchain/duchain.h>
 #include <language/duchain/duchainlock.h>
-#include <language/duchain/declaration.h>
 
 #include <KPluginFactory>
-
 #include <QRegularExpression>
 #include <QStringList>
+
+#include "debug.h"
+#include "registry/docset.h"
+#include "zealdocumentation.h"
 
 using namespace KDevelop;
 
@@ -41,30 +40,24 @@ ZealdocProvider::ZealdocProvider( const QString& docsetPath, QObject* parent )
 
 	m_isValid = ds.isValid();
 
-	if ( !isValid() )
-	{
-		return;
-	}
+	if ( !isValid() ) { return; }
 
 	m_name = ds.title();
 	m_icon = ds.icon();
 
 	QStringList allTokens;
 
-	auto tokenGroups{ ds.symbolCounts() };
+	auto			   tokenGroups{ ds.symbolCounts() };
 	QMapIterator<QString, int> i{ tokenGroups };
 
 	while ( i.hasNext() )
 	{
 		i.next();
 
-		QString groupName{ i.key() };
-		auto groupTokens{ ds.symbols( groupName ) };
+		const QString groupName{ i.key() };
+		auto	      groupTokens{ ds.symbols( groupName ) };
 
-		if ( !groupTokens.isEmpty() )
-		{
-			m_tokenGroups << groupName;
-		}
+		if ( !groupTokens.isEmpty() ) { m_tokenGroups << groupName; }
 
 		QMapIterator<QString, QUrl> j{ groupTokens };
 
@@ -72,8 +65,8 @@ ZealdocProvider::ZealdocProvider( const QString& docsetPath, QObject* parent )
 		{
 			j.next();
 
-			QString token{ j.key() };
-			QUrl url{ j.value() };
+			const QString token{ j.key() };
+			const QUrl    url{ j.value() };
 
 			m_tokenUrls[token] = url;
 			m_groupTokens[groupName] << token;
@@ -94,20 +87,11 @@ ZealdocProvider::ZealdocProvider( const QString& docsetPath, QObject* parent )
 
 ZealdocProvider::~ZealdocProvider() = default;
 
-bool ZealdocProvider::isValid()
-{
-	return m_isValid;
-}
+bool ZealdocProvider::isValid() { return m_isValid; }
 
-QIcon ZealdocProvider::icon() const
-{
-	return m_icon;
-}
+QIcon ZealdocProvider::icon() const { return m_icon; }
 
-QString ZealdocProvider::name() const
-{
-	return m_name;
-}
+QString ZealdocProvider::name() const { return m_name; }
 
 IDocumentation::Ptr ZealdocProvider::homePage() const
 {
@@ -126,13 +110,14 @@ IDocumentation::Ptr ZealdocProvider::documentationForDeclaration( Declaration* d
 	if ( dec )
 	{
 		static const IndexedString qmlJs{ "QML/JS" };
-		QString token;
+		QString			   token;
 
 		{
-			DUChainReadLocker lock;
+			const DUChainReadLocker lock;
 			token = dec->qualifiedIdentifier().toString( RemoveTemplateInformation );
 
-			if ( dec->topContext()->parsingEnvironmentFile()->language() == qmlJs && !token.isEmpty() )
+			if ( dec->topContext()->parsingEnvironmentFile()->language() == qmlJs
+			     && !token.isEmpty() )
 			{
 				token = QLatin1String( "QML." ) + token;
 			}
@@ -165,15 +150,9 @@ KDevelop::IDocumentation::Ptr ZealdocProvider::documentationForToken( const QStr
 	return {};
 }
 
-QAbstractListModel* ZealdocProvider::indexModel() const
-{
-	return m_model;
-}
+QAbstractListModel* ZealdocProvider::indexModel() const { return m_model; }
 
-QStringList ZealdocProvider::tokenGroups() const
-{
-	return m_tokenGroups;
-}
+QStringList ZealdocProvider::tokenGroups() const { return m_tokenGroups; }
 
 QIcon ZealdocProvider::groupIcon( const QString& group )
 {

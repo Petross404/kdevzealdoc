@@ -21,7 +21,6 @@
 
 #include <QLoggingCategory>
 
-namespace Zeal
-{
-Q_DECLARE_LOGGING_CATEGORY ( KDEV_ZEALDOC )
+namespace Zeal {
+Q_DECLARE_LOGGING_CATEGORY( KDEV_ZEALDOC )
 }

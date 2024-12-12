@@ -2,24 +2,23 @@
     "GenericName": "Zeal Documentation",
     "KPlugin": {
         "Authors": [
-        {
-            "Name": "Anton Anikin",
-            "Name[x-test]": "xxAnton Anikinxx"
-        }
+            {
+                "Name": "Anton Anikin"
+            }
         ],
         "Category": "Documentation",
         "Description": "This plugin provides Zeal documentation integration (zealdocs.org)",
         "Icon": "zeal",
         "Id": "kdevzealdoc",
-        "License": "GPL",
+        "License": "GPL-3.0",
         "Name": "Zeal Documentation",
         "ServiceTypes": [
-        "KDevelop/Plugin"
+            "KDevelop/Plugin"
         ]
     },
     "X-KDevelop-Category": "Global",
     "X-KDevelop-Interfaces": [
-    "org.kdevelop.IDocumentationProviderProvider"
+        "org.kdevelop.IDocumentationProviderProvider"
     ],
     "X-KDevelop-Mode": "GUI"
 }

@@ -1,62 +1,55 @@
 /* This file is part of KDevelop
-  **  Copyright 2016 Anton Anikin <anton.anikin@htower.ru>
-  *
-  *  This program is free software; you can redistribute it and/or
-  *  modify it under the terms of the GNU General Public
-  *  License as published by the Free Software Foundation; either
-  *  version 2 of the License, or (at your option) any later version.
-  *
-  *  This program is distributed in the hope that it will be useful,
-  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  *  General Public License for more details.
-  *
-  *  You should have received a copy of the GNU General Public License
-  *  along with this program; see the file COPYING.  If not, write to
-  *  the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-  *  Boston, MA 02110-1301, USA.
-  */
+ **  Copyright 2016 Anton Anikin <anton.anikin@htower.ru>
+ *
+ *  This program is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2 of the License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ *  General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; see the file COPYING.  If not, write to
+ *  the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ *  Boston, MA 02110-1301, USA.
+ */
 
 #include "zealdocumentation.h"
-#include "zealdocprovider.h"
 
+#include <documentation/standarddocumentationview.h>
 #include <interfaces/icore.h>
 #include <interfaces/idocumentationcontroller.h>
-#include <documentation/standarddocumentationview.h>
 
 #include <KLocalizedString>
-
 #include <QTreeView>
 
-using namespace KDevelop;
+#include "zealdocprovider.h"
 
 ZealdocProvider* ZealDocumentation::m_provider = nullptr;
 
 ZealDocumentation::ZealDocumentation( const QString& name, const QUrl& url )
-	: m_name( name )
-	, m_url( url )
-{
-}
+	: m_name{ name }
+	, m_url{ url }
+{}
 
-QWidget* ZealDocumentation::documentationWidget( DocumentationFindWidget* findWidget, QWidget* parent )
+QWidget* ZealDocumentation::documentationWidget( KDevelop::DocumentationFindWidget* findWidget,
+						 QWidget* parent )
 {
-	auto view = new StandardDocumentationView( findWidget, parent );
+	KDevelop::StandardDocumentationView* view{
+		new KDevelop::StandardDocumentationView{ findWidget, parent } };
 	view->load( m_url );
 
 	return view;
 }
 
-QString ZealDocumentation::name() const
-{
-	return m_name;
-}
+QString ZealDocumentation::name() const { return m_name; }
 
-QString ZealDocumentation::description() const
-{
-	return m_name;
-}
+QString ZealDocumentation::description() const { return m_name; }
 
-IDocumentationProvider* ZealDocumentation::provider() const
+KDevelop::IDocumentationProvider* ZealDocumentation::provider() const
 {
 	return m_provider;
 }
@@ -70,17 +63,15 @@ QString ZealDocumentationHome::name() const
 	return i18n( "%1 Content Page", ZealDocumentation::m_provider->name() );
 }
 
-QString ZealDocumentationHome::description() const
-{
-	return name();
-}
+QString ZealDocumentationHome::description() const { return name(); }
 
-QWidget* ZealDocumentationHome::documentationWidget( DocumentationFindWidget* findWidget, QWidget* parent )
+QWidget* ZealDocumentationHome::documentationWidget( KDevelop::DocumentationFindWidget* findWidget,
+						     QWidget* parent )
 {
 	Q_UNUSED( findWidget );
 
-	QTreeView* contents = new QTreeView( parent );
-	auto model = new ZealContentsModel( contents );
+	QTreeView*	   contents{ new QTreeView{ parent } };
+	ZealContentsModel* model{ new ZealContentsModel{ contents } };
 
 	QObject::connect( contents, &QTreeView::clicked, model, &ZealContentsModel::showItem );
 
@@ -90,7 +81,7 @@ QWidget* ZealDocumentationHome::documentationWidget( DocumentationFindWidget* fi
 	return contents;
 }
 
-IDocumentationProvider* ZealDocumentationHome::provider() const
+KDevelop::IDocumentationProvider* ZealDocumentationHome::provider() const
 {
 	return ZealDocumentation::m_provider;
 }
@@ -98,9 +89,8 @@ IDocumentationProvider* ZealDocumentationHome::provider() const
 // =================================================================================================
 
 ZealContentsModel::ZealContentsModel( QObject* parent )
-	: QAbstractItemModel( parent )
-{
-}
+	: QAbstractItemModel{ parent }
+{}
 
 int ZealContentsModel::rowCount( const QModelIndex& parent ) const
 {
@@ -109,10 +99,12 @@ int ZealContentsModel::rowCount( const QModelIndex& parent ) const
 		return ZealDocumentation::m_provider->tokenGroups().size();
 	}
 
-	if ( int( parent.internalId() ) < 0 )
+	if ( static_cast<int>( parent.internalId() ) < 0 )
 	{
-		QString groupName = parent.data( Qt::DisplayRole ).toString();
-		int groupSize = ZealDocumentation::m_provider->groupTokens( groupName ).size();
+		QString groupName{ parent.data( Qt::DisplayRole ).toString() };
+
+		int groupSize =
+			ZealDocumentation::m_provider->groupTokens( groupName ).size();
 
 		return groupSize;
 	}
@@ -120,10 +112,7 @@ int ZealContentsModel::rowCount( const QModelIndex& parent ) const
 	return 0;
 }
 
-int ZealContentsModel::columnCount( const QModelIndex& ) const
-{
-	return 1;
-}
+int ZealContentsModel::columnCount( const QModelIndex& ) const { return 1; }
 
 QModelIndex ZealContentsModel::parent( const QModelIndex& child ) const
 {
@@ -132,46 +121,35 @@ QModelIndex ZealContentsModel::parent( const QModelIndex& child ) const
 		return createIndex( child.internalId(), 0, -1 );
 	}
 
-	return QModelIndex();
+	return QModelIndex{};
 }
 
 QModelIndex ZealContentsModel::index( int row, int column, const QModelIndex& parent ) const
 {
-	if ( row < 0 || column != 0 )
-	{
-		return QModelIndex();
-	}
+	if ( row < 0 || column != 0 ) { return QModelIndex{}; }
 
-	if ( !parent.isValid() && row >= rowCount() )
-	{
-		return QModelIndex();
-	}
+	if ( !parent.isValid() && row >= rowCount() ) { return QModelIndex{}; }
 
-	return createIndex( row, column, int( parent.isValid() ? parent.row() : -1 ) );
+	return createIndex( row, column, parent.isValid() ? parent.row() : -1 );
 }
 
 QVariant ZealContentsModel::data( const QModelIndex& index, int role ) const
 {
 	if ( index.isValid() )
 	{
-		int internal( index.internalId() );
-		QString groupName;
+		const int internal = index.internalId();
+		QString	  groupName;
 
 		if ( internal < 0 )
 		{
-			groupName = ZealDocumentation::m_provider->tokenGroups().at( index.row() );
+			groupName = ZealDocumentation::m_provider->tokenGroups().at(
+				index.row() );
 		}
-		else
-		{
-			groupName = index.parent().data( Qt::DisplayRole ).toString();
-		}
+		else { groupName = index.parent().data( Qt::DisplayRole ).toString(); }
 
 		if ( role == Qt::DisplayRole )
 		{
-			if ( internal < 0 )
-			{
-				return groupName;
-			}
+			if ( internal < 0 ) { return groupName; }
 
 			return ZealDocumentation::m_provider->groupTokens( groupName ).at( index.row() );
 		}
@@ -182,14 +160,15 @@ QVariant ZealContentsModel::data( const QModelIndex& index, int role ) const
 		}
 	}
 
-	return QVariant();
+	return {};
 }
 
 void ZealContentsModel::showItem( const QModelIndex& idx )
 {
 	if ( idx.isValid() && int( idx.internalId() ) >= 0 )
 	{
-		auto doc = ZealDocumentation::m_provider->documentationForToken( idx.data( Qt::DisplayRole ).toString() );
-		ICore::self()->documentationController()->showDocumentation( doc );
+		auto doc = ZealDocumentation::m_provider->documentationForToken(
+			idx.data( Qt::DisplayRole ).toString() );
+		KDevelop::ICore::self()->documentationController()->showDocumentation( doc );
 	}
 }
