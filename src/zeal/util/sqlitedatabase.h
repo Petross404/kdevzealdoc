@@ -167,8 +167,8 @@ private:
 	 */
 	void updateLastError();
 
-	std::unique_ptr<sqlite3, SQLite3Deleter>               m_db;
-	std::unique_ptr<sqlite3_stmt, SQLite3StmtDeleter>      m_stmt;
+	std::unique_ptr<sqlite3, SQLite3Deleter>	  m_db;
+	std::unique_ptr<sqlite3_stmt, SQLite3StmtDeleter> m_stmt;
 
 	QString m_lastError;
 };

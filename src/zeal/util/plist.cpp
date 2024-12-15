@@ -28,8 +28,8 @@
 using namespace Zeal::Util;
 
 Plist::Plist()
-	: QHash<QString, QVariant>()
-	, m_hasError( false )	 // Initialize the base QHash and error state
+	: QHash<QString, QVariant>{}
+	, m_hasError{ false }	 // Initialize the base QHash and error state
 {}
 
 bool Plist::read( const QString& fileName )

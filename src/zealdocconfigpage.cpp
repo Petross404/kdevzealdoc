@@ -63,12 +63,13 @@ ZealdocConfigPage::~ZealdocConfigPage() = default;
 
 void ZealdocConfigPage::reloadDocsets( const QString& path )
 {
-	auto enabled{ enabledDocsets() };
+	const QStringList enabled{ enabledDocsets() };
 
 	m_ui->docsetsList->clear();
 
 	for ( const auto& docsetInformation : availableDocsets( path ) )
 	{
+		// Skip invalid docsets
 		if ( !docsetInformation.isValid ) { continue; }
 
 		auto item{ new QListWidgetItem( m_ui->docsetsList ) };
@@ -120,9 +121,15 @@ void ZealdocConfigPage::apply()
 
 void ZealdocConfigPage::defaults()
 {
+	// Temporarily block signals to prevent triggering any connected slots
+	// while modifying the UI components programmatically.
 	QSignalBlocker blocker{ this };
+
+	// Set the docsets path to the default value.
 	m_ui->kcfg_docsetsPath->setText( defaultDocsetsPath() );
 
+	// Iterate through the docsets list and uncheck all items
+	// to reset their state to the default (unchecked).
 	for ( int i = 0; i < m_ui->docsetsList->count(); i++ )
 	{
 		m_ui->docsetsList->item( i )->setCheckState( Qt::Unchecked );

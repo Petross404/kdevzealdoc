@@ -31,12 +31,10 @@
 #include "registry/docset.h"
 #include "zealdocumentation.h"
 
-using namespace KDevelop;
-
 ZealdocProvider::ZealdocProvider( const QString& docsetPath, QObject* parent )
 	: QObject{ parent }
 {
-	Zeal::Registry::Docset ds{ docsetPath };
+	const Zeal::Registry::Docset ds{ docsetPath };
 
 	m_isValid = ds.isValid();
 
@@ -47,7 +45,7 @@ ZealdocProvider::ZealdocProvider( const QString& docsetPath, QObject* parent )
 
 	QStringList allTokens;
 
-	auto			   tokenGroups{ ds.symbolCounts() };
+	QMap<QString, int>	   tokenGroups{ ds.symbolCounts() };
 	QMapIterator<QString, int> i{ tokenGroups };
 
 	while ( i.hasNext() )
@@ -93,10 +91,10 @@ QIcon ZealdocProvider::icon() const { return m_icon; }
 
 QString ZealdocProvider::name() const { return m_name; }
 
-IDocumentation::Ptr ZealdocProvider::homePage() const
+KDevelop::IDocumentation::Ptr ZealdocProvider::homePage() const
 {
 	ZealDocumentation::m_provider = const_cast<ZealdocProvider*>( this );
-	return IDocumentation::Ptr( new ZealDocumentationHome );
+	return KDevelop::IDocumentation::Ptr( new ZealDocumentationHome );
 }
 
 KDevelop::IDocumentation::Ptr ZealdocProvider::documentation( const QUrl& url ) const
@@ -105,16 +103,17 @@ KDevelop::IDocumentation::Ptr ZealdocProvider::documentation( const QUrl& url ) 
 	return documentationForToken( token );
 }
 
-IDocumentation::Ptr ZealdocProvider::documentationForDeclaration( Declaration* dec ) const
+KDevelop::IDocumentation::Ptr ZealdocProvider::documentationForDeclaration( KDevelop::Declaration* dec ) const
 {
 	if ( dec )
 	{
-		static const IndexedString qmlJs{ "QML/JS" };
-		QString			   token;
+		static const KDevelop::IndexedString qmlJs{ "QML/JS" };
+		QString				     token;
 
 		{
-			const DUChainReadLocker lock;
-			token = dec->qualifiedIdentifier().toString( RemoveTemplateInformation );
+			const KDevelop::DUChainReadLocker lock;
+			token = dec->qualifiedIdentifier().toString(
+				KDevelop::RemoveTemplateInformation );
 
 			if ( dec->topContext()->parsingEnvironmentFile()->language() == qmlJs
 			     && !token.isEmpty() )
@@ -129,7 +128,7 @@ IDocumentation::Ptr ZealdocProvider::documentationForDeclaration( Declaration* d
 	return {};
 }
 
-IDocumentation::Ptr ZealdocProvider::documentationForIndex( const QModelIndex& index ) const
+KDevelop::IDocumentation::Ptr ZealdocProvider::documentationForIndex( const QModelIndex& index ) const
 {
 	return documentationForToken( index.data( Qt::DisplayRole ).toString() );
 }
@@ -143,7 +142,8 @@ KDevelop::IDocumentation::Ptr ZealdocProvider::documentationForToken( const QStr
 		if ( url.isValid() )
 		{
 			ZealDocumentation::m_provider = const_cast<ZealdocProvider*>( this );
-			return IDocumentation::Ptr( new ZealDocumentation( token, url ) );
+			return KDevelop::IDocumentation::Ptr(
+				new ZealDocumentation( token, url ) );
 		}
 	}
 

@@ -73,7 +73,7 @@ QWidget* ZealDocumentationHome::documentationWidget( KDevelop::DocumentationFind
 	QTreeView*	   contents{ new QTreeView{ parent } };
 	ZealContentsModel* model{ new ZealContentsModel{ contents } };
 
-	QObject::connect( contents, &QTreeView::clicked, model, &ZealContentsModel::showItem );
+	connect( contents, &QTreeView::clicked, model, &ZealContentsModel::showItem );
 
 	contents->setHeaderHidden( true );
 	contents->setModel( model );
